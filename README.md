@@ -2,6 +2,8 @@
 
 Una adaptación web en español de [Secret Hitler](https://secrethitler.com), un juego de mesa de deducción social para hasta 10 jugadores creado por Goat, Wolf & Cabbage.
 
+Juega en: **[secrethitler.lat](https://secrethitler.lat)**
+
 Este proyecto es un fork de [Secret Hitler Online](https://github.com/ShrimpCryptid/Secret-Hitler-Online) traducido completamente al español.
 
 ### El Juego
