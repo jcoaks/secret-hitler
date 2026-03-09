@@ -64,6 +64,22 @@ type RoleAlertProps = {
 };
 
 /**
+ * Traduce el rol al español
+ */
+const translateRole = (role?: Role): string => {
+  switch (role) {
+    case Role.LIBERAL:
+      return "LIBERAL";
+    case Role.FASCIST:
+      return "FASCISTA";
+    case Role.HITLER:
+      return "HITLER";
+    default:
+      return "";
+  }
+};
+
+/**
  * CustomAlert content that shows the player's current role and a quick guide on how to play
  * the game.
  * Parameters:
@@ -115,7 +131,7 @@ class RoleAlert extends Component<RoleAlertProps> {
       <div>
         <div>
           <h2 id="alert-header" className={"left-align"}>
-            ERES: {this.props.role}
+            ERES: {translateRole(this.props.role)}
           </h2>
           <img id="role" src={image} alt={alt} />
 

@@ -264,9 +264,9 @@ export default function PlayerDisplay(
 
         let roleText = "";
         if (playerName === props.gameState[PARAM_CHANCELLOR]) {
-          roleText = "CHANCELLOR";
+          roleText = "CANCILLER";
         } else if (playerName === props.gameState.president) {
-          roleText = "PRESIDENT";
+          roleText = "PRESIDENTE";
         }
 
         const disabledText = props.playerDisabledFilter!(
