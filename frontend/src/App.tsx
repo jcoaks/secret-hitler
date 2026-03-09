@@ -681,7 +681,8 @@ class App extends Component<{}, AppState> {
       <div className="App">
         <header className="App-header">SECRET HITLER</header>
         <br />
-        <div style={{ textAlign: "center" }}>
+        <div className="login-forms-container">
+        <div className="login-form">
           <h2>UNIRSE A UNA PARTIDA</h2>
           <MaxLengthTextField
             label={"Sala"}
@@ -706,8 +707,7 @@ class App extends Component<{}, AppState> {
             UNIRSE
           </button>
         </div>
-        <br />
-        <div>
+        <div className="login-form">
           <h2>CREAR UNA SALA</h2>
           <MaxLengthTextField
             label={"Tu Nombre"}
@@ -722,6 +722,7 @@ class App extends Component<{}, AppState> {
           >
             CREAR SALA
           </button>
+        </div>
         </div>
         <br />
         <LoginPageContent />

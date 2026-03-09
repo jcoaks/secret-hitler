@@ -6,10 +6,13 @@
 }
 
 #login-page-description-container {
-    display: inline-flex;
-    flex-direction: row;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     align-content: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 #login-page-gif-container {
@@ -27,28 +30,23 @@
     margin: 10px;
 }
 
-#login-page-description-container {
-    display: flex;
-    flex: auto;
-    width: 100%;
-    align-items: center;
-    align-content: center;
-}
-
 #login-page-description-text-header {
     text-align: center;
 }
 
 #login-page-description-text {
-    width: 80vmin;
+    width: 100%;
+    max-width: 800px;
     font-weight: 400;
     line-height: 1.5;
     text-align: left;
-    margin: 10px;
+    margin: 10px auto;
 }
 
 #login-page-description-text-container {
+    width: 100%;
     align-content: center;
     align-items: center;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
 }

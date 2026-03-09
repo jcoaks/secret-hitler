@@ -27,26 +27,22 @@ class LoginPageContent extends Component {
                     <div id={"login-page-description-text-container"}>
                         <h2 id={"login-page-description-text-header"}>¿Qué es Secret Hitler?</h2>
                         <p id={"login-page-description-text"}>
-                            Secret Hitler es una adaptación del juego de mesa original Secret Hitler,
-                            reimaginado para la web.
-                            Soporta hasta 10 jugadores, con arte fluido y animaciones con todo el secreto e
-                            intriga del original. Está diseñado para ser fácil de jugar en cualquier noche de juegos.<br/><br/>¡Juega gratis en tu navegador, sin anuncios nunca!
-                            <br/><br/>
+                            Secret Hitler es una adaptación del juego de mesa original <a href={"https://secrethitler.com"} target={"_blank"} rel="noreferrer" onClick={this.onClickGameWebsite}>
+                                Secret Hitler
+                            </a>,
+                            reimaginado para la web,
+                            soporta hasta 10 jugadores, contiene arte, animaciones y todo el secreto e
+                            intriga del original. Está diseñado para ser fácil de jugar en cualquier noche de juegos.
                         </p>
                     </div>
                     <div id={"login-page-description-text-container"}>
                         <p id={"login-page-description-text"}>
-                            <br/>
                             Este proyecto es un fork de <a
                                 href={"https://github.com/ShrimpCryptid/Secret-Hitler-Online"}
                                 rel="noreferrer"
                                 target={"_blank"} onClick={this.onClickAbout}>
                                 Secret Hitler Online
                             </a>, el cual es de código abierto y está licenciado bajo CC BY-NC-SA 4.0.
-                            <br/><br/>
-                            Adaptado del juego de mesa original <a href={"https://secrethitler.com"} target={"_blank"} rel="noreferrer" onClick={this.onClickGameWebsite}>
-                                Secret Hitler
-                            </a> de Goat, Wolf, & Cabbage (© 2016-2020). Secret Hitler Online desarrollado por ShrimpCryptid (© 2020-2023).
                         </p>
                         <br/>
                     </div>

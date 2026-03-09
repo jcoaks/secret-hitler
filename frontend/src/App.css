@@ -11,6 +11,36 @@ div {
     text-align:center;
 }
 
+/* Contenedor de formularios de login */
+.login-forms-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+}
+
+.login-form {
+    width: 100%;
+    max-width: 500px;
+}
+
+/* En pantallas grandes (tablets y computadoras), mostrar en columnas */
+@media (min-width: 768px) {
+    .login-forms-container {
+        flex-direction: row;
+        align-items: flex-start;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .login-form {
+        flex: 1;
+        min-width: 300px;
+    }
+}
+
 header { /*This is the bar that appears at the top of the game.*/
     background-color: #E05B2B; /*var(--headerFill);*/
     min-height: 6vh; /*This means 8% of the viewport height.*/
