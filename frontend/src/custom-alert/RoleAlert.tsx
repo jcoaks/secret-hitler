@@ -41,19 +41,19 @@ const FascistImagesAltText = [
 ];
 
 const LiberalText = [
-  "You win if the board fills with liberal policies, or if Hitler is executed.",
-  "You lose if the board fills with fascist policies, or if Hitler is elected chancellor after 3 fascist policies are passed.",
-  "Keep your eyes open and look for suspicious actions. Suss out Hitler, and remember that anyone might be lying!",
+  "Ganas si el tablero se llena de políticas liberales, o si Hitler es ejecutado.",
+  "Pierdes si el tablero se llena de políticas fascistas, o si Hitler es elegido canciller después de que se aprueben 3 políticas fascistas.",
+  "Mantén los ojos abiertos y busca acciones sospechosas. Descubre a Hitler, ¡y recuerda que cualquiera podría estar mintiendo!",
 ];
 const FascistText = [
-  "You win if Hitler is successfully elected chancellor once 3 fascist policies are on the board, or if the board fills with fascist policies.",
-  "You lose if the board fills with liberal policies or if Hitler is executed.",
-  "Keep suspicion off of Hitler and look for ways to throw confusion into the game.",
+  "Ganas si Hitler es elegido canciller exitosamente una vez que haya 3 políticas fascistas en el tablero, o si el tablero se llena de políticas fascistas.",
+  "Pierdes si el tablero se llena de políticas liberales o si Hitler es ejecutado.",
+  "Mantén las sospechas lejos de Hitler y busca formas de sembrar confusión en el juego.",
 ];
 const HitlerText = [
-  "You win if you are successfully elected chancellor once 3 fascist policies are on the board, or if the board fills with fascist policies.",
-  "You lose if the board fills with liberal policies or if you are executed.",
-  "Try to gain trust and rely on the other fascists to open opportunities for you.",
+  "Ganas si eres elegido canciller exitosamente una vez que haya 3 políticas fascistas en el tablero, o si el tablero se llena de políticas fascistas.",
+  "Pierdes si el tablero se llena de políticas liberales o si eres ejecutado.",
+  "Intenta ganar confianza y confía en los otros fascistas para que te abran oportunidades.",
 ];
 
 type RoleAlertProps = {
@@ -115,7 +115,7 @@ class RoleAlert extends Component<RoleAlertProps> {
       <div>
         <div>
           <h2 id="alert-header" className={"left-align"}>
-            YOU ARE: {this.props.role}
+            ERES: {this.props.role}
           </h2>
           <img id="role" src={image} alt={alt} />
 
@@ -124,7 +124,7 @@ class RoleAlert extends Component<RoleAlertProps> {
           <p className="highlight left-align">{roleText[2]}</p>
         </div>
 
-        <button onClick={this.props.onClick}>OKAY</button>
+        <button onClick={this.props.onClick}>ACEPTAR</button>
       </div>
     );
   }

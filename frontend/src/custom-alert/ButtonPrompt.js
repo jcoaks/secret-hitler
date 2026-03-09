@@ -28,7 +28,7 @@ class ButtonPrompt extends Component {
 
 // noinspection JSUnusedGlobalSymbols
 ButtonPrompt.defaultProps = {
-    label: "LABEL GOES HERE",
+    label: "LA ETIQUETA VA AQUÍ",
     renderLabel: (obj) => {
         return (<h2 id={"prompt-label"} className={"left-align"}>{obj.props.label}</h2>);
     },
@@ -47,7 +47,7 @@ ButtonPrompt.defaultProps = {
         );
     },
 
-    buttonText: "CONFIRM",
+    buttonText: "CONFIRMAR",
     buttonOnClick: () => {console.log("Button clicked.")},
     buttonDisabled: false,
     renderButton: (obj) => {

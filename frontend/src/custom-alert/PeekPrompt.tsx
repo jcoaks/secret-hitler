@@ -44,9 +44,9 @@ class PeekPrompt extends Component<PeekPromptProps, PeekPromptState> {
   render() {
     return (
       <ButtonPrompt
-        label={"PEEK"}
-        headerText={"These are the next three policies in the draw deck."}
-        buttonText={"OKAY"}
+        label={"ESPIAR"}
+        headerText={"Estas son las próximas tres políticas en el mazo de robo."}
+        buttonText={"ACEPTAR"}
         buttonOnClick={this.onButtonClick}
         buttonDisabled={this.state.waitingForServer}
       >

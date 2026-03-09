@@ -97,7 +97,7 @@ class VotingPrompt extends Component<VotingPromptProps, VotingPromptState> {
     let presidentName = this.props.gameState[PARAM_PRESIDENT];
     return (
       <ButtonPrompt
-        label={"VOTING"}
+        label={"VOTACIÓN"}
         renderHeader={() => {
           return (
             <>
@@ -112,13 +112,13 @@ class VotingPrompt extends Component<VotingPromptProps, VotingPromptState> {
 
               <p className="left-align">
                 {presidentName +
-                  " has nominated " +
+                  " ha nominado a " +
                   chancellorName +
-                  " as chancellor."}
+                  " como canciller."}
               </p>
               <p className="left-align">
                 {
-                  "Vote on whether you want this government to proceed; The vote passes if over 50% of the votes are yes."
+                  "Vota si quieres que este gobierno proceda; La votación pasa si más del 50% de los votos son sí."
                 }
               </p>
 
@@ -127,14 +127,14 @@ class VotingPrompt extends Component<VotingPromptProps, VotingPromptState> {
               {this.props.gameState.fascistPolicies >= 3 && (
                 <p className="highlight left-align">
                   {
-                    "Fascists will win if Hitler is successfully voted in as chancellor!"
+                    "¡Los fascistas ganarán si Hitler es votado exitosamente como canciller!"
                   }
                 </p>
               )}
               {this.props.gameState.electionTracker === 2 && (
                 <p className="highlight left-align">
                   {
-                    "If this vote fails, the next policy in the draw deck will be immediately enacted."
+                    "Si esta votación falla, la siguiente política en el mazo de robo será promulgada inmediatamente."
                   }
                 </p>
               )}
@@ -154,7 +154,7 @@ class VotingPrompt extends Component<VotingPromptProps, VotingPromptState> {
               (this.state.selection === "yes" ? "selected " : "")
             } /*Determines if this should be selected.*/
             src={YesVote}
-            alt={"Ja! (Yes)"}
+            alt={"¡Ja! (Sí)"}
             onClick={() => this.setState({ selection: "yes" })}
           />
           <img

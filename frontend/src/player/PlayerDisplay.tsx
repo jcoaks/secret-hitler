@@ -37,7 +37,7 @@ export const DISABLE_EXECUTED_PLAYERS = (
   gameState: GameState
 ) => {
   if (!gameState.players[name].alive) {
-    return "EXECUTED";
+    return "EJECUTADO";
   }
   return "";
 };
@@ -55,9 +55,9 @@ export const DISABLE_INVESTIGATED_PLAYERS = (
   gameState: GameState
 ) => {
   if (!gameState.players[name].alive) {
-    return "EXECUTED";
+    return "EJECUTADO";
   } else if (gameState.players[name].investigated) {
-    return "SEARCHED";
+    return "INVESTIGADO";
   }
   return "";
 };
@@ -85,11 +85,11 @@ export const DISABLE_TERM_LIMITED_PLAYERS = (
   }
 
   if (!gameState.players[name].alive) {
-    return "EXECUTED";
+    return "EJECUTADO";
   } else if (gameState.lastChancellor === name) {
-    return "TERM LIMITED";
+    return "LÍMITE DE MANDATO";
   } else if (gameState.lastPresident === name && livingPlayers > 5) {
-    return "TERM LIMITED";
+    return "LÍMITE DE MANDATO";
   } else {
     return "";
   }

@@ -21,47 +21,32 @@ class LoginPageContent extends Component {
     };
 
     render() {
-        let handleDragStart = (e) => e.preventDefault();
-        let items = [
-            <img id={"login-page-gif"} src={'https://i.postimg.cc/zvnLRbqq/place-policy.gif'} onDragStart={handleDragStart} alt={"A policy tile being placed on the board."}/>,
-            <img id={"login-page-gif"} src={'https://i.postimg.cc/Wbvqcn7z/show-policy.gif'} onDragStart={handleDragStart} alt={"An animated folder revealing a policy tile."}/>,
-            <img id={"login-page-gif"} src={'https://i.postimg.cc/cCNCZxw2/show-votes.gif'} onDragStart={handleDragStart} alt={"An animation showing all the cast votes."}/>
-        ];
         return (
             <>
                 <div id={"#login-page-description-container"}>
                     <div id={"login-page-description-text-container"}>
-                        <h2 id={"login-page-description-text-header"}>What is Secret Hitler Online?</h2>
+                        <h2 id={"login-page-description-text-header"}>¿Qué es Secret Hitler?</h2>
                         <p id={"login-page-description-text"}>
-                            Secret Hitler Online is an adaptation of the original Secret Hitler board game,
-                            reimagined for the web.
-                            It supports up to 10 players, featuring smooth art and animations with all the secrecy and
-                            intrigue of the original. It's designed to be easy to pick up and play for any quarantine
-                            game night.<br/><br/>Play for free in your browser, with no ads ever!
+                            Secret Hitler es una adaptación del juego de mesa original Secret Hitler,
+                            reimaginado para la web.
+                            Soporta hasta 10 jugadores, con arte fluido y animaciones con todo el secreto e
+                            intriga del original. Está diseñado para ser fácil de jugar en cualquier noche de juegos.<br/><br/>¡Juega gratis en tu navegador, sin anuncios nunca!
                             <br/><br/>
                         </p>
-                    </div>
-                    <div id={"login-page-gif-container"}>
-                        {items}
                     </div>
                     <div id={"login-page-description-text-container"}>
                         <p id={"login-page-description-text"}>
                             <br/>
-                            The project is open-source, and is licensed under CC BY-NC-SA 4.0.
-                            You can read more about the project <a
-                                href={"https://github.com/ShrimpCryptid/Secret-Hitler-Online/"}
+                            Este proyecto es un fork de <a
+                                href={"https://github.com/ShrimpCryptid/Secret-Hitler-Online"}
                                 rel="noreferrer"
                                 target={"_blank"} onClick={this.onClickAbout}>
-                                    on GitHub
-                            </a>!
+                                Secret Hitler Online
+                            </a>, el cual es de código abierto y está licenciado bajo CC BY-NC-SA 4.0.
                             <br/><br/>
-                            Adapted from the original <a href={"https://secrethitler.com"} target={"_blank"} rel="noreferrer" onClick={this.onClickGameWebsite}>
+                            Adaptado del juego de mesa original <a href={"https://secrethitler.com"} target={"_blank"} rel="noreferrer" onClick={this.onClickGameWebsite}>
                                 Secret Hitler
-                            </a> board game by Goat, Wolf, & Cabbage (© 2016-2020). Developed by ShrimpCryptid (© 2020-2023).
-                            <br/><br/>
-                            Found a bug or want to leave a comment? Report bugs on the <a href={"https://github.com/ShrimpCryptid/Secret-Hitler-Online/issues"}
-                                                                                             rel="noreferrer"
-                                                                                             target={"_blank"}>Issues page</a>.
+                            </a> de Goat, Wolf, & Cabbage (© 2016-2020). Secret Hitler Online desarrollado por ShrimpCryptid (© 2020-2023).
                         </p>
                         <br/>
                     </div>

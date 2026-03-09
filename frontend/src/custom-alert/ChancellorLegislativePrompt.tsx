@@ -65,7 +65,7 @@ class ChancellorLegislativePrompt extends Component<
     } else {
       // veto power is not activated
       this.props.showError(
-        "Veto power is unlocked when there are 5 fascist policies."
+        "El poder de veto se desbloquea cuando hay 5 políticas fascistas."
       );
     }
   }
@@ -75,21 +75,21 @@ class ChancellorLegislativePrompt extends Component<
     let props = this.props;
     return (
       <ButtonPrompt
-        label={"LEGISLATIVE SESSION"}
+        label={"SESIÓN LEGISLATIVA"}
         headerText={
-          "Choose a policy to enact. The remaining policy will be discarded."
+          "Elige una política para promulgar. La política restante será descartada."
         }
         renderHeader={() => {
           return (
             <>
               <p className={"left-align"}>
-                Choose a policy to enact. The remaining policy will be
-                discarded.
+                Elige una política para promulgar. La política restante será
+                descartada.
               </p>
               {props.fascistPolicies === 5 && (
                 <p className={"left-align highlight"}>
-                  Veto power unlocked: If you choose to veto and the president
-                  agrees to the veto, the agenda will be discarded.
+                  Poder de veto desbloqueado: Si eliges vetar y el presidente
+                  acepta el veto, la agenda será descartada.
                 </p>
               )}
             </>
@@ -103,7 +103,7 @@ class ChancellorLegislativePrompt extends Component<
                   onClick={this.onVetoButtonClick}
                   disabled={this.state.waitingForServer}
                 >
-                  VETO
+                  VETAR
                 </button>
               )}
               <button
@@ -113,7 +113,7 @@ class ChancellorLegislativePrompt extends Component<
                   this.state.waitingForServer
                 }
               >
-                ENACT
+                PROMULGAR
               </button>
             </div>
           );

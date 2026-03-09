@@ -98,21 +98,21 @@ export const SelectNominationPrompt = (
     <SelectPlayerPrompt
       user={user}
       commandType={WSCommandType.NOMINATE_CHANCELLOR}
-      label={"NOMINATION"}
+      label={"NOMINACIÓN"}
       gameState={gameState}
       sendWSCommand={sendWSCommand}
       renderHeader={() => {
         return (
           <div>
             <p className="left-align">
-              Nominate a player to become the next Chancellor.
+              Nomina un jugador para que se convierta en el próximo Canciller.
             </p>
             <p
               className="left-align highlight"
               hidden={!shouldFascistVictoryWarningBeShown}
             >
-              Fascists will win if Hitler is nominated and voted in as
-              Chancellor!
+              ¡Los fascistas ganarán si Hitler es nominado y votado como
+              Canciller!
             </p>
           </div>
         );
@@ -145,21 +145,21 @@ export const SelectInvestigationPrompt = (
       commandType={WSCommandType.GET_INVESTIGATION}
       disabledFilter={DISABLE_INVESTIGATED_PLAYERS}
       includeUser={false}
-      label={"INVESTIGATE LOYALTY"}
+      label={"INVESTIGAR LEALTAD"}
       renderHeader={() => {
         return (
           <>
             <p className={"left-align"}>
-              Choose a player and investigate their party alignment. You'll
-              learn if the player is a member of the Fascist or Liberal party,
-              but not their specific role (e.g., Hitler).
+              Elige un jugador e investiga su afiliación partidaria. Aprenderás
+              si el jugador es miembro del partido Fascista o Liberal,
+              pero no su rol específico (ej., Hitler).
             </p>
             <p className={"left-align"}>
-              Players that have been investigated once cannot be investigated
-              again.
+              Los jugadores que han sido investigados una vez no pueden ser investigados
+              de nuevo.
             </p>
             <p className={"left-align highlight"}>
-              (Remember that you can lie about the player's party alignment!)
+              (¡Recuerda que puedes mentir sobre la afiliación partidaria del jugador!)
             </p>
           </>
         );
@@ -181,9 +181,9 @@ export const SelectSpecialElectionPrompt = (
       commandType={WSCommandType.REGISTER_SPECIAL_ELECTION}
       disabledFilter={DISABLE_EXECUTED_PLAYERS}
       includeUser={false}
-      label={"SPECIAL ELECTION"}
+      label={"ELECCIÓN ESPECIAL"}
       headerText={
-        "Choose any player to become the next president. Once their term is finished, the order continues as normal."
+        "Elige cualquier jugador para que se convierta en el próximo presidente. Una vez que su mandato termine, el orden continúa como normal."
       }
     />
   );
@@ -202,16 +202,16 @@ export const SelectExecutionPrompt = (
       commandType={WSCommandType.REGISTER_EXECUTION}
       disabledFilter={DISABLE_EXECUTED_PLAYERS}
       includeUser={false}
-      label={"EXECUTION"}
+      label={"EJECUCIÓN"}
       renderHeader={() => {
         return (
           <>
             <p className={"left-align"}>
-              Choose a player to execute. That player can no longer speak, vote,
-              or run for office.
+              Elige un jugador para ejecutar. Ese jugador ya no podrá hablar, votar,
+              ni postularse para cargos.
             </p>
             <p className={"left-align highlight"}>
-              The game ends and Liberals win if Hitler is executed.
+              El juego termina y los Liberales ganan si Hitler es ejecutado.
             </p>
           </>
         );

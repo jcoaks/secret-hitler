@@ -2,19 +2,19 @@
     "alert": {
         "roles": {
             "hitler": {
-                "1": "You win if you are successfully elected chancellor once 3 fascist policies are on the board, or if the board fills with fascist policies.",
-                "2": "You lose if the board fills with liberal policies or if you are executed.",
-                "3": "Try to gain trust and rely on the other fascists to open opportunities for you."
+                "1": "Ganas si eres elegido canciller exitosamente una vez que haya 3 políticas fascistas en el tablero, o si el tablero se llena de políticas fascistas.",
+                "2": "Pierdes si el tablero se llena de políticas liberales o si eres ejecutado.",
+                "3": "Intenta ganar confianza y confía en los otros fascistas para que te abran oportunidades."
             },
             "fascist": {
-                "1": "You win if Hitler is successfully elected chancellor once 3 fascist policies are on the board, or if the board fills with fascist policies.",
-                "2": "You lose if the board fills with liberal policies or if Hitler is executed.",
-                "3": "Keep suspicion off of Hitler and look for ways to throw confusion into the game."
+                "1": "Ganas si Hitler es elegido canciller exitosamente una vez que haya 3 políticas fascistas en el tablero, o si el tablero se llena de políticas fascistas.",
+                "2": "Pierdes si el tablero se llena de políticas liberales o si Hitler es ejecutado.",
+                "3": "Mantén las sospechas lejos de Hitler y busca formas de sembrar confusión en el juego."
             },
             "liberal": {
-                "1": "You win if the board fills with liberal policies, or if Hitler is executed.",
-                "2": "You lose if the board fills with fascist policies, or if Hitler is elected chancellor after 3 fascist policies are passed.",
-                "3": "Keep your eyes open and look for suspicious actions. Suss out Hitler, and remember that anyone might be lying!"
+                "1": "Ganas si el tablero se llena de políticas liberales, o si Hitler es ejecutado.",
+                "2": "Pierdes si el tablero se llena de políticas fascistas, o si Hitler es elegido canciller después de que se aprueben 3 políticas fascistas.",
+                "3": "Mantén los ojos abiertos y busca acciones sospechosas. Descubre a Hitler, ¡y recuerda que cualquiera podría estar mintiendo!"
             }
         }
     }

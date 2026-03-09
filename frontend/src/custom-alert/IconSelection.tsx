@@ -36,15 +36,10 @@ class IconSelection extends Component<IconSelectionProps, IconSelectionState> {
   constructor(props: IconSelectionProps) {
     super(props);
 
-    // Check if the locked icons prompt should be shown. (using cookies!)
-    let hasUserUnlockedIcons = false;
-    if (Cookies.get(UNLOCK_ICONS_COOKIE_NAME)) {
-      hasUserUnlockedIcons = true;
-    }
-
+    // Todos los íconos están desbloqueados por defecto
     this.state = {
-      unlockLockedIcons: hasUserUnlockedIcons,
-      showLockedPrompt: !hasUserUnlockedIcons,
+      unlockLockedIcons: true,
+      showLockedPrompt: false,
     };
 
     this.onConfirmButtonClick = this.onConfirmButtonClick.bind(this);
@@ -158,85 +153,20 @@ class IconSelection extends Component<IconSelectionProps, IconSelectionState> {
   }
 
   render() {
-    let headerPortraits: string[];
-    let footerContent: () => React.ReactNode;
-    if (this.state.showLockedPrompt) {
-      headerPortraits = unlockedPortraits;
-      footerContent = () => {
-        return (
-          <>
-            <h2 style={{ textAlign: "left" }}>EXTRA ICONS:</h2>
-            <div id={"locked-icon-text-container"}>
-              <p id={"icon-text"} style={{ textAlign: "left" }}>
-                Unlock these {lockedPortraits.length} extra icons by sharing
-                this website! I'd really like for more people to enjoy this
-                game, so this would be a big help.
-              </p>
-              <TwitterShareButton
-                url={"https://secret-hitler.online!"}
-                options={{
-                  text: "I'm playing #SecretHitlerOnline at",
-                  size: "large",
-                }}
-                onLoad={this.addTwitterHooks}
-                placeholder={
-                  <p
-                    id={"icon-text"}
-                    style={{ color: "var(--textColorLiberal)" }}
-                  >
-                    Loading...
-                  </p>
-                }
-              />
-            </div>
-            {this.getIconButtonHML(lockedPortraits)}
-          </>
-        );
-      }; // end footer content
-    } else {
-      headerPortraits = unlockedPortraits.concat(lockedPortraits);
-      footerContent = () => {
-        return (
-          <>
-            <div id={"locked-icon-text-container"}>
-              <p>
-                (You unlocked {lockedPortraits.length} extra icons by sharing
-                Secret Hitler Online! Thank you! 💖)
-              </p>
-              <TwitterShareButton
-                url={"https://secret-hitler.online!"}
-                options={{
-                  text: "I'm playing #SecretHitlerOnline at",
-                  size: "large",
-                }}
-                onLoad={this.addTwitterHooks}
-                placeholder={
-                  <p
-                    id={"icon-text"}
-                    style={{ color: "var(--textColorLiberal)" }}
-                  >
-                    Loading...
-                  </p>
-                }
-              />
-            </div>
-          </>
-        );
-      }; // end footer content
-    }
+    // Todos los íconos disponibles desde el principio
+    const allPortraits = unlockedPortraits.concat(lockedPortraits);
 
     return (
       <ButtonPrompt
-        label={"PLAYER LOOK"}
+        label={"APARIENCIA DEL JUGADOR"}
         renderHeader={() => {
           return (
             <>
-              <p>Choose a look, then press confirm.</p>
-              {this.getIconButtonHML(headerPortraits)}
+              <p>Elige una apariencia, luego presiona confirmar.</p>
+              {this.getIconButtonHML(allPortraits)}
             </>
           );
         }}
-        renderFooter={footerContent}
         buttonDisabled={
           this.props.playerToIcon[this.props.user] === defaultPortrait
         }

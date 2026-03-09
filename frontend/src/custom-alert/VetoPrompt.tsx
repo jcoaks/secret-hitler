@@ -36,34 +36,34 @@ class VetoPrompt extends Component<VetoPromptProps, VetoPromptState> {
   render() {
     return (
       <ButtonPrompt
-        label={"LEGISLATIVE VETO"}
+        label={"VETO LEGISLATIVO"}
         renderHeader={() => {
           return (
             <>
               <p className={"left-align"}>
-                The chancellor has requested to veto the agenda.
+                El canciller ha solicitado vetar la agenda.
               </p>
               {this.props.electionTracker === 2 && (
                 <p className={"left-align highlight"}>
-                  If the veto is accepted, the top policy on the draw pile will
-                  be automatically enacted.
+                  Si el veto es aceptado, la política superior del mazo de robo será
+                  promulgada automáticamente.
                 </p>
               )}
               {this.props.electionTracker !== 2 && (
                 <p className={"left-align"}>
-                  If the veto is accepted, the remaining policies will be
-                  discarded and the election tracker will advance by 1.
+                  Si el veto es aceptado, las políticas restantes serán
+                  descartadas y el rastreador de elecciones avanzará 1.
                 </p>
               )}
               <p className={"left-align"}>
-                Otherwise, the chancellor will be required to enact a policy as
+                De lo contrario, el canciller deberá promulgar una política como
                 normal.
               </p>
               <br />
             </>
           );
         }}
-        footerText={"Accept the veto?"}
+        footerText={"¿Aceptar el veto?"}
         renderButton={() => {
           return (
             <>
@@ -71,13 +71,13 @@ class VetoPrompt extends Component<VetoPromptProps, VetoPromptState> {
                 onClick={() => this.onButtonClick(false)}
                 disabled={this.state.waitingForServer}
               >
-                REJECT
+                RECHAZAR
               </button>
               <button
                 onClick={() => this.onButtonClick(true)}
                 disabled={this.state.waitingForServer}
               >
-                ACCEPT
+                ACEPTAR
               </button>
             </>
           );

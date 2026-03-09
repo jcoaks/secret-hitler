@@ -376,7 +376,7 @@ class App extends Component<{}, AppState> {
     ) {
       if (this.failedConnections >= 1) {
         // Only show the error bar if the first attempt has failed.
-        this.showSnackBar("Lost connection to the server: retrying...");
+        this.showSnackBar("Conexión perdida con el servidor: reintentando...");
         ReactGA.event({
           category: "Lost Server Connection",
           action: "User lost connection to the server. (>1 attempts)",
@@ -391,7 +391,7 @@ class App extends Component<{}, AppState> {
       this.setState({
         joinName: this.state.name,
         joinLobby: this.state.lobby,
-        joinError: "Disconnected from the lobby.",
+        joinError: "Desconectado de la sala.",
         page: PAGE.LOGIN,
       });
       ReactGA.event({
@@ -499,7 +499,7 @@ class App extends Component<{}, AppState> {
       this.websocket.send(JSON.stringify(data));
     } else {
       this.showSnackBar(
-        "Could not connect to the server. Try refreshing the page if this happens again."
+        "No se pudo conectar con el servidor. Intenta refrescar la página si esto vuelve a ocurrir."
       );
     }
   }
@@ -554,7 +554,7 @@ class App extends Component<{}, AppState> {
    * Attempts to connect to the lobby via websocket.
    */
   onClickJoin = () => {
-    this.setState({ joinError: "Connecting..." });
+    this.setState({ joinError: "Conectando..." });
     this.tryLogin(this.state.joinName, this.state.joinLobby)
       .then((response) => {
         if (!response.ok) {
@@ -562,7 +562,7 @@ class App extends Component<{}, AppState> {
             console.log("Response is not ok");
           }
           if (response.status === 404) {
-            this.setState({ joinError: "The lobby could not be found." });
+            this.setState({ joinError: "No se pudo encontrar la sala." });
             ReactGA.event({
               category: "Login Failed",
               action: "Lobby not found - User unable to connect.",
@@ -570,22 +570,22 @@ class App extends Component<{}, AppState> {
           } else if (response.status === 403) {
             this.setState({
               joinError:
-                "There is already a user with the name '" +
+                "Ya hay un usuario con el nombre '" +
                 this.state.joinName +
-                "' in the lobby.",
+                "' en la sala.",
             });
             ReactGA.event({
               category: "Login Failed",
               action: "Duplicate name - User unable to connect.",
             });
           } else if (response.status === 488) {
-            this.setState({ joinError: "The lobby is currently in a game." });
+            this.setState({ joinError: "La sala está actualmente en una partida." });
             ReactGA.event({
               category: "Login Failed",
               action: "Ongoing game - User unable to connect.",
             });
           } else if (response.status === 489) {
-            this.setState({ joinError: "The lobby is currently full." });
+            this.setState({ joinError: "La sala está llena." });
             ReactGA.event({
               category: "Login Failed",
               action: "Lobby full - User unable to connect.",
@@ -593,7 +593,7 @@ class App extends Component<{}, AppState> {
           } else {
             this.setState({
               joinError:
-                "There was an error connecting to the server. Please try again.",
+                "Hubo un error al conectar con el servidor. Por favor intenta de nuevo.",
             });
             ReactGA.event({
               category: "Login Failed",
@@ -607,7 +607,7 @@ class App extends Component<{}, AppState> {
           ) {
             this.setState({
               joinError:
-                "There was an error connecting to the server. Please try again.",
+                "Hubo un error al conectar con el servidor. Por favor intenta de nuevo.",
             });
           } else {
             // Save the username and lobby login
@@ -619,7 +619,7 @@ class App extends Component<{}, AppState> {
       .catch(() => {
         this.setState({
           joinError:
-            "There was an error contacting the server. Please wait and try again.",
+            "Hubo un error al contactar el servidor. Por favor espera e intenta de nuevo.",
         });
       });
   };
@@ -628,7 +628,7 @@ class App extends Component<{}, AppState> {
    * Attempts to connect to the server and create a new lobby, and then opens a connection to the lobby.
    */
   onClickCreateLobby = () => {
-    this.setState({ createLobbyError: "Connecting..." });
+    this.setState({ createLobbyError: "Conectando..." });
     this.tryCreateLobby()
       .then((response) => {
         if (response.ok) {
@@ -637,7 +637,7 @@ class App extends Component<{}, AppState> {
               // if the connection failed
               this.setState({
                 createLobbyError:
-                  "There was an error connecting to the server. Please try again.",
+                  "Hubo un error al conectar con el servidor. Por favor intenta de nuevo.",
               });
               ReactGA.event({
                 category: "Lobby Creation Failed",
@@ -656,7 +656,7 @@ class App extends Component<{}, AppState> {
         } else {
           this.setState({
             createLobbyError:
-              "There was an error connecting to the server. Please try again.",
+              "Hubo un error al conectar con el servidor. Por favor intenta de nuevo.",
           });
           ReactGA.event({
             category: "Lobby Creation Failed",
@@ -667,7 +667,7 @@ class App extends Component<{}, AppState> {
       .catch(() => {
         this.setState({
           createLobbyError:
-            "There was an error connecting to the server. Please try again.",
+            "Hubo un error al conectar con el servidor. Por favor intenta de nuevo.",
         });
         ReactGA.event({
           category: "Lobby Creation Failed",
@@ -679,22 +679,12 @@ class App extends Component<{}, AppState> {
   renderLoginPage() {
     return (
       <div className="App">
-        <header className="App-header">SECRET-HITLER.ONLINE</header>
+        <header className="App-header">SECRET HITLER</header>
         <br />
         <div style={{ textAlign: "center" }}>
-          {/** TODO: Add reusable announcement component. 
-                    <div style={{backgroundColor: "#222222", width: "50vmin", margin: "0 auto", padding: "20px"}}>
-                        <p>
-                            Hello! Secret Hitler Online is currently undergoing some maintenance.
-                            Sorry for the interruption and please check back in in a few hours! -Shrimp
-                        </p>
-                        <p style={{fontStyle: "italic", fontSize: "calc(8px + 1vmin)"}}>(DATE TIME PM PT)</p>
-
-                    </div>
-                    */}
-          <h2>JOIN A GAME</h2>
+          <h2>UNIRSE A UNA PARTIDA</h2>
           <MaxLengthTextField
-            label={"Lobby"}
+            label={"Sala"}
             onChange={this.updateJoinLobby}
             value={this.state.joinLobby}
             maxLength={LOBBY_CODE_LENGTH}
@@ -703,7 +693,7 @@ class App extends Component<{}, AppState> {
           />
 
           <MaxLengthTextField
-            label={"Your Name"}
+            label={"Tu Nombre"}
             onChange={this.updateJoinName}
             value={this.state.joinName}
             maxLength={12}
@@ -713,14 +703,14 @@ class App extends Component<{}, AppState> {
             onClick={this.onClickJoin}
             disabled={!this.shouldJoinButtonBeEnabled()}
           >
-            JOIN
+            UNIRSE
           </button>
         </div>
         <br />
         <div>
-          <h2>CREATE A LOBBY</h2>
+          <h2>CREAR UNA SALA</h2>
           <MaxLengthTextField
-            label={"Your Name"}
+            label={"Tu Nombre"}
             onChange={this.updateCreateLobbyName}
             value={this.state.createLobbyName}
             maxLength={12}
@@ -730,31 +720,9 @@ class App extends Component<{}, AppState> {
             onClick={this.onClickCreateLobby}
             disabled={!this.shouldCreateLobbyButtonBeEnabled()}
           >
-            CREATE LOBBY
+            CREAR SALA
           </button>
         </div>
-        <AnnouncementBox>
-          <h2>Announcing: BOTS!</h2>
-          <p>
-            You can now start games with only 1-4 players; extra spots will be
-            filled by bots.
-          </p>
-          <p>
-            Bots are still in beta, so{" "}
-            <a
-              href={
-                "https://github.com/ShrimpCryptid/Secret-Hitler-Online/issues/44"
-              }
-              target={"_blank"}
-              rel="noreferrer"
-            >
-              leave feedback on GitHub!
-            </a>
-          </p>
-          <p style={{ fontStyle: "italic", fontSize: "calc(8px + 1vmin)" }}>
-            (Please be nice, they are trying their best.)
-          </p>
-        </AnnouncementBox>
         <br />
         <LoginPageContent />
       </div>
@@ -851,7 +819,7 @@ class App extends Component<{}, AppState> {
     (text as HTMLTextAreaElement).select();
     (text as HTMLTextAreaElement).setSelectionRange(0, 999999);
     document.execCommand("copy");
-    this.showSnackBar("Copied!");
+    this.showSnackBar("¡Copiado!");
   }
 
   showSnackBar(message: string) {
@@ -877,7 +845,7 @@ class App extends Component<{}, AppState> {
       this.state.usernames[0] === this.state.name;
     return (
       <div className="App">
-        <header className="App-header">SECRET-HITLER.ONLINE</header>
+        <header className="App-header">SECRET HITLER</header>
 
         <CustomAlert show={this.state.showAlert}>
           {this.state.alertContent}
@@ -887,7 +855,7 @@ class App extends Component<{}, AppState> {
           style={{ textAlign: "left", marginLeft: "20px", marginRight: "20px" }}
         >
           <div style={{ display: "flex", flexDirection: "row" }}>
-            <h2>LOBBY CODE: </h2>
+            <h2>CÓDIGO DE SALA: </h2>
             <h2
               style={{ marginLeft: "5px", color: "var(--textColorHighlight)" }}
             >
@@ -896,7 +864,7 @@ class App extends Component<{}, AppState> {
           </div>
 
           <p style={{ marginBottom: "2px" }}>
-            Copy and share this link to invite other players.
+            Copia y comparte este enlace para invitar a otros jugadores.
           </p>
           <div
             style={{
@@ -911,20 +879,20 @@ class App extends Component<{}, AppState> {
               readOnly={true}
               value={"https://secret-hitler.online/?lobby=" + this.state.lobby}
             />
-            <button onClick={this.onClickCopy}>COPY</button>
+            <button onClick={this.onClickCopy}>COPIAR</button>
           </div>
 
           <div id={"lobby-lower-container"}>
             <div id={"lobby-player-area-container"}>
               <div id={"lobby-player-text-choose-container"}>
                 <p id={"lobby-player-count-text"}>
-                  Players ({this.state.usernames.length}/10)
+                  Jugadores ({this.state.usernames.length}/10)
                 </p>
                 <button
                   id={"lobby-change-icon-button"}
                   onClick={this.onClickChangeIcon}
                 >
-                  CHANGE ICON
+                  CAMBIAR ÍCONO
                 </button>
               </div>
               <div id={"lobby-player-container"}>{this.renderPlayerList()}</div>
@@ -932,41 +900,15 @@ class App extends Component<{}, AppState> {
 
             <div id={"lobby-button-container"}>
               {!isVIP && (
-                <p id={"lobby-vip-text"}>Only the VIP can start the game.</p>
+                <p id={"lobby-vip-text"}>Solo el VIP puede iniciar la partida.</p>
               )}
               <button
                 onClick={this.onClickStartGame}
                 disabled={!isVIP || !this.shouldStartGameBeEnabled()}
               >
-                START GAME
+                INICIAR PARTIDA
               </button>
-              <button onClick={this.onClickLeaveLobby}>LEAVE LOBBY</button>
-            </div>
-            <div id={"lobby-text-container"}>
-              <p id={"lobby-about-text"}>
-                <a
-                  href={
-                    "https://github.com/ShrimpCryptid/Secret-Hitler-Online/blob/main/README.md"
-                  }
-                  target={"_blank"}
-                  rel="noopener noreferrer"
-                >
-                  About this project
-                </a>
-              </p>
-              <br />
-              <p id={"lobby-warning-text"}>
-                You can report bugs on the{" "}
-                <a
-                  href={
-                    "https://github.com/ShrimpCryptid/Secret-Hitler-Online/issues"
-                  }
-                  rel="noopener noreferrer"
-                  target={"_blank"}
-                >
-                  Issues page.
-                </a>
-              </p>
+              <button onClick={this.onClickLeaveLobby}>SALIR DE LA SALA</button>
             </div>
           </div>
         </div>
@@ -986,9 +928,9 @@ class App extends Component<{}, AppState> {
     if (name === newState.targetUser) {
       this.queueAlert(
         <ButtonPrompt
-          label={"YOU HAVE BEEN EXECUTED"}
+          label={"HAS SIDO EJECUTADO"}
           headerText={
-            "Executed players may not speak, vote, or run for office. You should not reveal your identity to the group."
+            "Los jugadores ejecutados no pueden hablar, votar, ni postularse para cargos. No debes revelar tu identidad al grupo."
           }
           buttonOnClick={this.hideAlertAndFinish}
         />,
@@ -997,13 +939,13 @@ class App extends Component<{}, AppState> {
     } else {
       this.queueAlert(
         <ButtonPrompt
-          label={"EXECUTION RESULTS"}
+          label={"RESULTADOS DE LA EJECUCIÓN"}
           footerText={
             newState.targetUser +
-            " has been executed. They may no longer speak, vote, or run for office."
+            " ha sido ejecutado. Ya no puede hablar, votar, ni postularse para cargos."
           }
           buttonOnClick={this.hideAlertAndFinish}
-          buttonText={"OKAY"}
+          buttonText={"ACEPTAR"}
         >
           <PlayerDisplay
             user={name}
@@ -1131,9 +1073,9 @@ class App extends Component<{}, AppState> {
             );
           }
 
-          this.queueEventUpdate("CHANCELLOR NOMINATION");
+          this.queueEventUpdate("NOMINACIÓN DE CANCILLER");
           this.queueStatusMessage(
-            "Waiting for president to nominate a chancellor."
+            "Esperando a que el presidente nomine un canciller."
           );
 
           if (isPresident) {
@@ -1147,8 +1089,8 @@ class App extends Component<{}, AppState> {
 
         case STATE_CHANCELLOR_VOTING:
           this.setState({ statusBarText: "" });
-          this.queueEventUpdate("VOTING");
-          this.queueStatusMessage("Waiting for all players to vote.");
+          this.queueEventUpdate("VOTACIÓN");
+          this.queueStatusMessage("Esperando a que todos los jugadores voten.");
           // Check if the player is dead or has already voted-- if so, do not show the voting prompt.
           if (
             newState.players[name][PLAYER_IS_ALIVE] &&
@@ -1169,12 +1111,12 @@ class App extends Component<{}, AppState> {
         case STATE_LEGISLATIVE_PRESIDENT:
           // The vote completed, so show the votes.
           this.addAnimationToQueue(() => this.showVotes(newState));
-          this.queueEventUpdate("LEGISLATIVE SESSION");
+          this.queueEventUpdate("SESIÓN LEGISLATIVA");
 
           // TODO: Animate cards being pulled from the draw deck for all users.
 
           this.queueStatusMessage(
-            "Waiting for the president to choose a policy to discard."
+            "Esperando a que el presidente elija una política para descartar."
           );
 
           if (isPresident) {
@@ -1193,7 +1135,7 @@ class App extends Component<{}, AppState> {
 
         case STATE_LEGISLATIVE_CHANCELLOR:
           this.queueStatusMessage(
-            "Waiting for the chancellor to choose a policy to enact."
+            "Esperando a que el canciller elija una política para promulgar."
           );
           if (isChancellor) {
             if (!newState.chancellorChoices) {
@@ -1218,7 +1160,7 @@ class App extends Component<{}, AppState> {
 
         case STATE_LEGISLATIVE_PRESIDENT_VETO:
           this.queueStatusMessage(
-            "Chancellor has motioned to veto the agenda. Waiting for the president to decide."
+            "El canciller ha propuesto vetar la agenda. Esperando a que el presidente decida."
           );
           if (isPresident) {
             this.queueAlert(
@@ -1232,7 +1174,7 @@ class App extends Component<{}, AppState> {
           break;
 
         case STATE_PP_PEEK:
-          this.queueEventUpdate("PRESIDENTIAL POWER");
+          this.queueEventUpdate("PODER PRESIDENCIAL");
           if (isPresident) {
             if (!newState.peek) {
               throw new Error("Peek policies not found.");
@@ -1246,26 +1188,26 @@ class App extends Component<{}, AppState> {
             );
           } else {
             this.queueStatusMessage(
-              "Peek: President is previewing the next 3 policies."
+              "Espiar: El presidente está viendo las próximas 3 políticas."
             );
           }
           break;
 
         case STATE_PP_ELECTION:
-          this.queueEventUpdate("PRESIDENTIAL POWER");
+          this.queueEventUpdate("PODER PRESIDENCIAL");
           if (isPresident) {
             this.queueAlert(
               SelectSpecialElectionPrompt(name, newState, this.sendWSCommand)
             );
           } else {
             this.queueStatusMessage(
-              "Special Election: President is choosing the next president."
+              "Elección Especial: El presidente está eligiendo al próximo presidente."
             );
           }
           break;
 
         case STATE_PP_EXECUTION:
-          this.queueEventUpdate("PRESIDENTIAL POWER");
+          this.queueEventUpdate("PODER PRESIDENCIAL");
           if (isPresident) {
             this.queueAlert(
               SelectExecutionPrompt(name, newState, this.sendWSCommand),
@@ -1273,20 +1215,20 @@ class App extends Component<{}, AppState> {
             );
           } else {
             this.queueStatusMessage(
-              "Execution: President is choosing a player to execute."
+              "Ejecución: El presidente está eligiendo un jugador para ejecutar."
             );
           }
           break;
 
         case STATE_PP_INVESTIGATE:
-          this.queueEventUpdate("PRESIDENTIAL POWER");
+          this.queueEventUpdate("PODER PRESIDENCIAL");
           if (isPresident) {
             this.queueAlert(
               SelectInvestigationPrompt(name, newState, this.sendWSCommand)
             );
           } else {
             this.queueStatusMessage(
-              "Investigation: President is choosing a player to investigate."
+              "Investigación: El presidente está eligiendo un jugador para investigar."
             );
           }
           break;
@@ -1299,15 +1241,15 @@ class App extends Component<{}, AppState> {
                 console.log("Special Election Alert: " + newState.targetUser);
                 this.queueAlert(
                   <ButtonPrompt
-                    label={"SPECIAL ELECTION"}
+                    label={"ELECCIÓN ESPECIAL"}
                     footerText={
                       newState[PARAM_PRESIDENT] +
-                      " has chosen " +
+                      " ha elegido a " +
                       newState.targetUser +
-                      " to be the next president." +
-                      "\nThe normal presidential order will resume after the next round."
+                      " para ser el próximo presidente." +
+                      "\nEl orden presidencial normal se reanudará después de la próxima ronda."
                     }
-                    buttonText={"OKAY"}
+                    buttonText={"ACEPTAR"}
                     buttonOnClick={this.hideAlertAndFinish}
                   >
                     <PlayerDisplay
@@ -1329,18 +1271,18 @@ class App extends Component<{}, AppState> {
               if (!isPresident) {
                 let isTarget = newState.targetUser === name;
                 let footerText = isTarget
-                  ? `You have been investigated by ${newState[PARAM_PRESIDENT]}. The president now knows your party affiliation.`
-                  : `${newState.targetUser} has been investigated by ${newState[PARAM_PRESIDENT]}. The president now knows their party affiliation.`;
+                  ? `Has sido investigado por ${newState[PARAM_PRESIDENT]}. El presidente ahora conoce tu afiliación partidaria.`
+                  : `${newState.targetUser} ha sido investigado por ${newState[PARAM_PRESIDENT]}. El presidente ahora conoce su afiliación partidaria.`;
                 this.queueAlert(
                   <ButtonPrompt
-                    label={"INVESTIGATION RESULTS"}
+                    label={"RESULTADOS DE LA INVESTIGACIÓN"}
                     // If target: You have been investigated by [President Name].
                     //            The president now knows your party affiliation.
                     // If not target: [Target Name] has been investigated by [President Name].
                     //                The president now knows their party affiliation.
                     footerText={footerText}
                     buttonOnClick={this.hideAlertAndFinish}
-                    buttonText={"OKAY"}
+                    buttonText={"ACEPTAR"}
                   >
                     <PlayerDisplay
                       user={name}
@@ -1361,7 +1303,7 @@ class App extends Component<{}, AppState> {
           }
 
           this.queueStatusMessage(
-            "Waiting for the president to end their term."
+            "Esperando a que el presidente termine su mandato."
           );
           break;
 
@@ -1427,23 +1369,23 @@ class App extends Component<{}, AppState> {
           if (fascistVictoryElection || fascistVictoryPolicy) {
             players = fascistPlayers.concat(liberalPlayers);
             headerImage = VictoryFascistHeader;
-            headerAlt = "Fascist Victory, written in red with a skull icon.";
+            headerAlt = "Victoria Fascista, escrito en rojo con un ícono de calavera.";
             messageClass = "highlight";
             if (fascistVictoryPolicy) {
-              victoryMessage = "Fascists successfully passed six policies!";
+              victoryMessage = "¡Los fascistas aprobaron exitosamente seis políticas!";
             } else if (fascistVictoryElection) {
               victoryMessage =
-                "Fascists successfully elected Hitler as chancellor!";
+                "¡Los fascistas eligieron exitosamente a Hitler como canciller!";
             }
           } else {
             players = liberalPlayers.concat(fascistPlayers);
             headerImage = VictoryLiberalHeader;
-            headerAlt = "Liberal Victory, written in blue with a dove icon.";
+            headerAlt = "Victoria Liberal, escrito en azul con un ícono de paloma.";
             messageClass = "highlight-blue";
             if (liberalVictoryPolicy) {
-              victoryMessage = "Liberals successfully passed five policies!";
+              victoryMessage = "¡Los liberales aprobaron exitosamente cinco políticas!";
             } else if (liberalVictoryExecution) {
-              victoryMessage = "Liberals successfully executed Hitler!";
+              victoryMessage = "¡Los liberales ejecutaron exitosamente a Hitler!";
             }
           }
           if (DEBUG) {
@@ -1470,7 +1412,7 @@ class App extends Component<{}, AppState> {
                       </>
                     );
                   }}
-                  buttonText={"RETURN TO LOBBY"}
+                  buttonText={"VOLVER A LA SALA"}
                   buttonOnClick={() => {
                     this.gameOver = false;
                     this.reconnectOnConnectionClosed = true;
@@ -1570,7 +1512,7 @@ class App extends Component<{}, AppState> {
   }
 
   showVotes(newState: GameState) {
-    this.setState({ statusBarText: "Tallying votes..." });
+    this.setState({ statusBarText: "Contando votos..." });
     setTimeout(() => {
       this.setState({ showVotes: true });
     }, 1000);
@@ -1588,11 +1530,11 @@ class App extends Component<{}, AppState> {
     setTimeout(() => {
       if (yesVotes > noVotes) {
         this.setState({
-          statusBarText: yesVotes + " - " + noVotes + ": Vote passed",
+          statusBarText: yesVotes + " - " + noVotes + ": Votación aprobada",
         });
       } else {
         this.setState({
-          statusBarText: yesVotes + " - " + noVotes + ": Vote failed",
+          statusBarText: yesVotes + " - " + noVotes + ": Votación rechazada",
         });
       }
     }, 2000);
@@ -1701,7 +1643,7 @@ class App extends Component<{}, AppState> {
   renderGamePage() {
     return (
       <div className="App" style={{ textAlign: "center" }}>
-        <header className="App-header">SECRET-HITLER.ONLINE</header>
+        <header className="App-header">SECRET HITLER</header>
 
         <CustomAlert show={this.state.showAlert}>
           {this.state.alertContent}
@@ -1756,7 +1698,7 @@ class App extends Component<{}, AppState> {
                   }}
                 >
                   {" "}
-                  END TERM
+                  TERMINAR MANDATO
                 </button>
 
                 <PlayerPolicyStatus

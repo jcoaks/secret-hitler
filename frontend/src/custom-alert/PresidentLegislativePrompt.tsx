@@ -50,11 +50,11 @@ class PresidentLegislativePrompt extends Component<
   render() {
     return (
       <ButtonPrompt
-        label={"LEGISLATIVE SESSION"}
+        label={"SESIÓN LEGISLATIVA"}
         headerText={
-          "Choose a policy to discard. The remaining policies are given to the chancellor."
+          "Elige una política para descartar. Las políticas restantes se le dan al canciller."
         }
-        buttonText={"DISCARD"}
+        buttonText={"DESCARTAR"}
         buttonOnClick={this.onButtonClick}
         buttonDisabled={
           this.state.selection === undefined || this.state.waitingForServer

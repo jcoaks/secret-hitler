@@ -22,20 +22,20 @@ class ElectionTrackerAlert extends Component {
     render() {
         return (
             <ButtonPrompt
-                label={"LEGISLATURE FAILED"}
+                label={"LEGISLATURA FALLIDA"}
                 renderHeader={() => {
                     return (<>
                             <p className={"left-align"}>
-                                The election tracker advances by 1 every time a government fails to
-                                (or refuses to) pass a policy, and resets whenever a policy is passed.
+                                El rastreador de elecciones avanza 1 cada vez que un gobierno falla en
+                                (o se niega a) aprobar una política, y se reinicia cuando se aprueba una política.
                             </p>
                             <p className={"left-align highlight"}>
-                                When the tracker reaches 3, the top policy on the draw deck is instantly passed.
-                                No presidential powers trigger and all term limits will be reset.
+                                Cuando el rastreador llega a 3, la política superior del mazo de robo se aprueba instantáneamente.
+                                No se activan poderes presidenciales y todos los límites de mandato se reiniciarán.
                             </p>
                         </>);
                 }}
-                buttonText={"OKAY"}
+                buttonText={"ACEPTAR"}
                 buttonOnClick={this.props.closeAlert}
             >
                 <div id={"election-tracker-container"}>

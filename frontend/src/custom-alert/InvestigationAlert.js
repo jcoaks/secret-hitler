@@ -31,7 +31,7 @@ class InvestigationAlert extends Component {
 
   render() {
     let alt =
-      this.props.target + " is a member of the " + this.props.party + " party.";
+      this.props.target + " es miembro del partido " + this.props.party + ".";
     let cardFrontSrc =
       this.props.party === LIBERAL ? PartyLiberal : PartyFascist;
     let footerClass = this.state.showText
@@ -42,20 +42,20 @@ class InvestigationAlert extends Component {
       : "investigation-container-default";
     return (
       <ButtonPrompt
-        label={"INVESTIGATION RESULTS"}
+        label={"RESULTADOS DE LA INVESTIGACIÓN"}
         renderFooter={() => {
           return (
             <p id="investigation-text" className={footerClass}>
               {this.props.target +
-                " is a member of the " +
+                " es miembro del partido " +
                 this.props.party +
-                " party."}
+                "."}
             </p>
           );
         }}
         buttonOnClick={this.props.hideAlert}
         buttonDisabled={this.state.disableButton}
-        buttonText={"OKAY"}
+        buttonText={"ACEPTAR"}
       >
         <div id={"party-card-container"}>
           <img
