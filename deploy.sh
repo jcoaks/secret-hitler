@@ -5,9 +5,11 @@
 
 set -e
 
-# Cargar variables de entorno
+# Cargar variables de entorno de forma segura
 if [ -f .env.production ]; then
-    export $(grep -v '^#' .env.production | xargs)
+    set -a
+    source .env.production
+    set +a
 fi
 
 DOMAIN="${DOMAIN:-secrethitler.lat}"
