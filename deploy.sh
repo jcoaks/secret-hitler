@@ -52,35 +52,17 @@ init_deploy() {
     
     check_env
     
-    # Crear directorios necesarios
-    mkdir -p nginx/ssl certbot/conf certbot/www
-    
     # Construir imágenes primero
     log_info "Construyendo imágenes Docker..."
     docker build -t secret-hitler-backend:latest -f backend/Dockerfile.prod backend/
     docker build -t secret-hitler-frontend:latest -f frontend/Dockerfile.prod frontend/
     
-    # Obtener certificado SSL temporal para iniciar nginx
-    log_info "Configurando SSL temporal..."
-    docker-compose -f docker-compose.prod.yml up -d nginx
-    
-    log_info "Solicitando certificado SSL de Let's Encrypt..."
-    docker-compose -f docker-compose.prod.yml run --rm certbot certonly \
-        --webroot \
-        --webroot-path=/var/www/certbot \
-        --email $EMAIL \
-        --agree-tos \
-        --no-eff-email \
-        -d $DOMAIN \
-        -d www.$DOMAIN
-    
-    # Reiniciar nginx con SSL real
-    docker-compose -f docker-compose.prod.yml restart nginx
-    
     log_info "Levantando todos los servicios..."
     docker-compose -f docker-compose.prod.yml --env-file .env.production up -d
     
     log_info "✅ Despliegue inicial completado"
+    log_info "Frontend disponible en: http://$(hostname -I | awk '{print $1}'):3000"
+    log_info "Backend disponible en: http://$(hostname -I | awk '{print $1}'):4040"
     log_info "Verifica el estado con: ./deploy.sh logs"
 }
 
@@ -105,10 +87,8 @@ update_deploy() {
 
 # Renovar certificado SSL
 renew_ssl() {
-    log_info "Renovando certificado SSL..."
-    docker-compose -f docker-compose.prod.yml run --rm certbot renew
-    docker-compose -f docker-compose.prod.yml restart nginx
-    log_info "✅ Certificado renovado"
+    log_warn "SSL no está configurado en este despliegue simplificado"
+    log_info "Configura SSL en tu proxy reverso externo"
 }
 
 # Reiniciar servicios
