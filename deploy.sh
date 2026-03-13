@@ -55,6 +55,11 @@ init_deploy() {
     # Crear directorios necesarios
     mkdir -p nginx/ssl certbot/conf certbot/www
     
+    # Construir imágenes primero
+    log_info "Construyendo imágenes Docker..."
+    docker build -t secret-hitler-backend:latest -f backend/Dockerfile.prod backend/
+    docker build -t secret-hitler-frontend:latest -f frontend/Dockerfile.prod frontend/
+    
     # Obtener certificado SSL temporal para iniciar nginx
     log_info "Configurando SSL temporal..."
     docker-compose -f docker-compose.prod.yml up -d nginx
@@ -89,7 +94,8 @@ update_deploy() {
     docker-compose -f docker-compose.prod.yml down
     
     log_info "Reconstruyendo imágenes..."
-    docker-compose -f docker-compose.prod.yml --env-file .env.production build --no-cache
+    docker build --no-cache -t secret-hitler-backend:latest -f backend/Dockerfile.prod backend/
+    docker build --no-cache -t secret-hitler-frontend:latest -f frontend/Dockerfile.prod frontend/
     
     log_info "Levantando servicios..."
     docker-compose -f docker-compose.prod.yml --env-file .env.production up -d
