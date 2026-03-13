@@ -1,22 +1,35 @@
-# Build Directories + Binary Files
-build
-out
-bin
-*.jar
+# Production environment files
+.env.production
 
-# Gradle stored files
-.gradle
+# SSL certificates
+certbot/
+nginx/ssl/
 
-# VSCode Workspace Configuration
-.idea/
-*.iml
-*.ipr
-*.iws
+# Logs
+*.log
+
+# OS files
 .DS_Store
-.vscode/
+Thumbs.db
 
-# Firebase Hosting Files
-**/.firebase
+# IDE
+.vscode/
+.idea/
 
 # Node
-**/node_modules/
+node_modules/
+npm-debug.log*
+
+# Build
+build/
+dist/
+target/
+
+# Gradle
+.gradle/
+backend/.gradle/
+backend/build/
+
+# Database
+*.sql
+postgres-data/
