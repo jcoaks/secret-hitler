@@ -8,7 +8,7 @@ export enum PAGE {
   GAME = "game",
 }
 
-export const DEBUG = process.env.REACT_APP_DEBUG !== undefined;
+export const DEBUG = process.env.REACT_APP_DEBUG === "DEBUG";
 // Configurar SERVER_ADDRESS según tu despliegue en secrethitler.lat
 // Ejemplo: "api.secrethitler.lat" o el dominio de tu servidor backend
 export const SERVER_ADDRESS =
