@@ -27,12 +27,9 @@ class LoginPageContent extends Component {
                     <div id={"login-page-description-text-container"}>
                         <h2 id={"login-page-description-text-header"}>¿Qué es Secret Hitler?</h2>
                         <p id={"login-page-description-text"}>
-                            Secret Hitler es una adaptación del juego de mesa original <a href={"https://secrethitler.com"} target={"_blank"} rel="noreferrer" onClick={this.onClickGameWebsite}>
-                                Secret Hitler
-                            </a>,
-                            reimaginado para la web,
-                            soporta hasta 10 jugadores, contiene arte, animaciones y todo el secreto e
-                            intriga del original. Está diseñado para ser fácil de jugar en cualquier noche de juegos.
+                            Un juego de deducción social para 5-10 jugadores. Los liberales deben descubrir y detener al Hitler secreto antes de que sea demasiado tarde. Basado en el <a href={"https://secrethitler.com"} target={"_blank"} rel="noreferrer" onClick={this.onClickGameWebsite}>
+                                juego de mesa original
+                            </a>, ahora disponible para jugar online y en español.
                         </p>
                     </div>
                     <div id={"login-page-description-text-container"}>
@@ -42,7 +39,15 @@ class LoginPageContent extends Component {
                                 rel="noreferrer"
                                 target={"_blank"} onClick={this.onClickAbout}>
                                 Secret Hitler Online
-                            </a>, el cual es de código abierto y está licenciado bajo CC BY-NC-SA 4.0.
+                            </a>, de código abierto bajo licencia CC BY-NC-SA 4.0.
+                        </p>
+                        <p id={"login-page-description-text"}>
+                            Código fuente disponible en <a
+                                href={"https://github.com/jcoaks/secret-hitler"}
+                                rel="noreferrer"
+                                target={"_blank"}>
+                                GitHub
+                            </a>.
                         </p>
                         <br/>
                     </div>
