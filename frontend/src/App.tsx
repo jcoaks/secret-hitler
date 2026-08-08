@@ -145,6 +145,7 @@ type AppState = {
   lobby: string;
   lobbyFromURL: boolean;
   usernames: string[];
+  host: string;
   icons: { [key: string]: string };
   gameState: GameState;
   /* Stores the last gameState[PARAM_STATE] value to check for changes. */
@@ -176,6 +177,7 @@ const defaultAppState: AppState = {
   lobby: "AAAAAA",
   lobbyFromURL: false,
   usernames: [],
+  host: "",
   icons: {},
   gameState: DEFAULT_GAME_STATE,
   lastState: {},
@@ -326,6 +328,7 @@ class App extends Component<{}, AppState> {
         name: name,
         lobby: lobby,
         usernames: [],
+        host: "",
         joinName: "",
         joinLobby: "",
         joinError: "",
@@ -427,6 +430,7 @@ class App extends Component<{}, AppState> {
       case PACKET_LOBBY:
         this.setState({
           usernames: message[PARAM_USERNAMES],
+          host: message["host"] || "",
           icons: message[PARAM_ICON],
           page: PAGE.LOBBY,
         });
@@ -744,7 +748,7 @@ class App extends Component<{}, AppState> {
       return (
         <Player
           key={i}
-          name={i === 0 ? name : name + " [Host]"}
+          name={name === this.state.host ? name + " [Host]" : name}
           showRole={false}
           icon={this.state.icons[name]}
           isBusy={this.state.icons[name] === defaultPortrait}
@@ -841,9 +845,7 @@ class App extends Component<{}, AppState> {
 
   renderLobbyPage() {
     // The first player in the lobby is counted as the VIP.
-    let isVIP =
-      this.state.usernames.length > 0 &&
-      this.state.usernames[0] === this.state.name;
+    let isVIP = this.state.host === this.state.name;
     return (
       <div className="App">
         <header className="App-header">SECRET HITLER</header>

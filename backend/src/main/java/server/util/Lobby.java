@@ -39,6 +39,9 @@ public class Lobby implements Serializable {
 
     private Set<CpuPlayer> cpuPlayers;
 
+    /* The username of the lobby host (first player to join). */
+    private String hostUsername;
+
     /* Used to reassign users to previously chosen images if they disconnect */
     final private ConcurrentHashMap<String, String> usernameToPreferredIcon;
 
@@ -210,6 +213,10 @@ public class Lobby implements Serializable {
                         if (!activeUsernames.contains(name)) {
                             activeUsernames.add(name);
                         }
+                        // The first player to join becomes the host.
+                        if (hostUsername == null) {
+                            hostUsername = name;
+                        }
                         // Set icon to default
                         usernameToIcon.put(name, DEFAULT_ICON);
                         // Attempt to retrieve previous icon (if it exists)
@@ -285,6 +292,16 @@ public class Lobby implements Serializable {
                 if (usernameToIcon.containsKey(username)) {
                     usernameToIcon.remove(username); // possible for users to disconnect before choosing icon
                 }
+
+                // If the removed user was the host, transfer host to the next active player.
+                if (username.equals(hostUsername)) {
+                    if (!activeUsernames.isEmpty()) {
+                        hostUsername = activeUsernames.peek();
+                    } else {
+                        hostUsername = null;
+                    }
+                }
+
                 updateAllUsers();
             }
         }
@@ -392,6 +409,7 @@ public class Lobby implements Serializable {
             message = new JSONObject();
             message.put(SecretHitlerServer.PARAM_PACKET_TYPE, SecretHitlerServer.PACKET_LOBBY);
             message.put("usernames", activeUsernames.toArray());
+            message.put("host", hostUsername);
         }
         // Add user icons to the update message
         JSONObject icons = new JSONObject(usernameToIcon);
