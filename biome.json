@@ -10,7 +10,6 @@
     "includes": [
       "**",
       "!**/worker-configuration.d.ts",
-      "!legacy",
       "!**/*.md",
       "!pnpm-lock.yaml",
       "!.vscode",

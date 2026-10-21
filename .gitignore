@@ -11,7 +11,3 @@ test-results/
 playwright-report/
 .idea/
 
-# Legacy stack (until it is deleted)
-legacy/backend/.gradle/
-legacy/backend/build/
-legacy/frontend/build/

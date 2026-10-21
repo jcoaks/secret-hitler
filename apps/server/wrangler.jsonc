@@ -8,6 +8,13 @@
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
   "observability": { "enabled": true },
+  // secrethitler.lat is in the same Cloudflare account. Custom domains need the hostname free of
+  // other DNS records (the old A record to Lightsail must be removed before the first deploy).
+  "routes": [
+    { "pattern": "secrethitler.lat", "custom_domain": true },
+    { "pattern": "www.secrethitler.lat", "custom_domain": true }
+  ],
+  "workers_dev": true,
   // The web app (apps/web, built with `pnpm --filter @sh/web build`) is served as static
   // assets; only /api/* reaches the Worker first. Unknown paths fall back to index.html.
   "assets": {
