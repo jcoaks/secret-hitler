@@ -1,122 +1,135 @@
+<div align="center">
+
 # Secret Hitler
 
-Una adaptación web en español de [Secret Hitler](https://secrethitler.com), un juego de mesa de deducción social para hasta 10 jugadores creado por Goat, Wolf & Cabbage.
+**Liberales contra fascistas, y un Hitler secreto entre ellos.**
 
-Juega en: **[secrethitler.lat](https://secrethitler.lat)**
+Una adaptación web en español de [Secret Hitler](https://secrethitler.com), el juego de deducción social para 5 a 10 jugadores:<br>
+creas una sala, compartes el enlace y empieza la legislatura.
 
-Código fuente: **[github.com/jcoaks/secret-hitler](https://github.com/jcoaks/secret-hitler)**
+### [▶ Jugar ahora: secrethitler.lat](https://secrethitler.lat)
 
-### El Juego
-En el juego, los jugadores se dividen en Liberales, Fascistas y un Hitler secreto. Los Liberales deben trabajar juntos (o no) para descubrir al Hitler secreto escondido entre ellos, mientras los Fascistas intentan elevar al Hitler secreto al poder. Aprueba políticas para lograr la victoria y desbloquea poderes presidenciales para investigar a tus amigos.
+<img src="docs/images/inicio.webp" alt="Pantalla inicial: crear una sala o unirse con un código" width="900">
 
-¿Puedes encontrar y detener al Hitler Secreto?
+</div>
 
-### Cómo Jugar
-Abre una nueva sala y usa el código de la sala o el enlace proporcionado para invitar a tus amigos. ¡Puedes jugar con hasta 10 jugadores a la vez!
+---
 
-Hay instrucciones sobre cómo jugar el juego proporcionadas en el sitio web, y se ofrecen muchos consejos útiles para jugadores primerizos. El juego se encarga de las reglas por ti, haciéndolo fácil de aprender y jugar.
+## Cómo se juega
 
-Para más información, lee el [reglamento oficial aquí](https://www.secrethitler.com/assets/Secret_Hitler_Rules.pdf).
+1. **Crea una sala** con tu nombre y comparte el enlace (o el código de 6 caracteres).
+2. **Elige tu retrato** y marca que estás listo. Con 5 a 10 jugadores, el anfitrión empieza.
+3. **Abre tu sobre.** Eres liberal, fascista o Hitler; los fascistas se conocen entre sí.
+4. **Forma gobierno:** el presidente nomina canciller y todos votan ¡Ja! o Nein.
+5. **Legisla:** el presidente descarta una política y el canciller aprueba otra. Algunas políticas fascistas dan poderes: investigar, espiar el mazo, elección especial o ejecutar.
+6. **Gana tu bando:** cinco políticas liberales o Hitler ejecutado para los liberales; seis políticas fascistas o Hitler elegido canciller (con tres fascistas en la mesa) para los fascistas.
 
-## Acerca de este proyecto
+Las reglas completas están dentro del juego, en **Cómo se juega**.
 
-### Características
-- ✅ Interfaz completamente en español
-- ✅ Soporte para 5-10 jugadores
-- ✅ Comunicación en tiempo real vía WebSocket
-- ✅ Interfaz optimizada y responsiva
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/votacion.webp" alt="Votación revelada sobre las cartas de los jugadores"></td>
+    <td width="50%"><img src="docs/images/legislativa.webp" alt="El presidente elige qué política descartar"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Los votos se revelan a la vez sobre cada jugador</sub></td>
+    <td align="center"><sub>La sesión legislativa del presidente</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/final.webp" alt="Victoria liberal con todos los roles revelados"></td>
+    <td width="50%">
+      <h3>Lo que trae</h3>
+      <ul>
+        <li>Los tres tableros (5–6, 7–8 y 9–10 jugadores) con todos sus poderes y el veto</li>
+        <li>Cada jugador solo recibe lo que puede saber: ni cartas ajenas ni votos antes de tiempo</li>
+        <li>Historial de gobiernos, votos y políticas</li>
+        <li>Si alguien pierde la conexión, la partida se pausa y su asiento le espera</li>
+        <li>Recargar la página no te saca de la mesa</li>
+        <li>Funciona en escritorio y en el móvil, todo en español</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Al final se revelan todos los roles</sub></td>
+    <td></td>
+  </tr>
+</table>
 
-### Detalles Técnicos
-El servidor Java está dividido en la [simulación del juego](backend/src/main/java/game) y la [API REST](backend/src/main/java/server). La comunicación entre el servidor y el cliente se realiza mediante websocket y solicitudes HTTP, utilizando la [biblioteca Javalin](https://javalin.io/).
+---
 
-La [página web](frontend) está escrita en [React](https://reactjs.org/), y presenta animaciones creadas con CSS. Los recursos fueron adaptados del juego de mesa original o creados usando [Inkscape](https://inkscape.org/).
+## Desarrollo
 
-## Desarrollo y Despliegue
+Necesitas **Node 22+** y **pnpm 9**.
 
-### Desarrollo Local
-
-Para ejecutar el proyecto localmente:
-
-```bash
-# Clonar el repositorio
-git clone https://github.com/jcoaks/secret-hitler.git
-cd secret-hitler
-
-# Levantar servicios con Docker Compose
-docker-compose up
+```sh
+pnpm install
+pnpm dev
 ```
 
-El frontend estará disponible en `http://localhost:3000` y el backend en `http://localhost:4040`.
+`pnpm dev` levanta dos cosas:
+- el Worker de Cloudflare con las salas, en `http://localhost:8787`;
+- la web, en `http://127.0.0.1:5173`, que reenvía `/api` al Worker.
 
-### Despliegue en Producción
+Para sentar a varios jugadores, abre varias ventanas (o una normal y otra privada), o llena la mesa con bots:
 
-Este proyecto está configurado para desplegarse en AWS Lightsail (o cualquier servidor con Docker).
-
-#### Configuración Inicial
-
-1. **Clonar el repositorio en el servidor:**
-```bash
-git clone https://github.com/jcoaks/secret-hitler.git
-cd secret-hitler
+```sh
+pnpm --filter @sh/e2e fill <CÓDIGO> [bots=4] [ms entre jugadas=1500]
 ```
 
-2. **Configurar variables de entorno:**
-```bash
-# Editar .env.production con tus credenciales
-nano .env.production
+### Comprobaciones
+
+| Comando | Qué hace |
+|---|---|
+| `pnpm lint` | Biome: formato y lint |
+| `pnpm typecheck` | TypeScript en todos los paquetes |
+| `pnpm test` | Pruebas unitarias: motor (incluidas 1.800 partidas aleatorias), protocolo, salas y web |
+| `pnpm build` | Compila la web en `apps/web/dist` |
+| `pnpm e2e` | Partidas completas de 5 y 7 jugadores en Chromium contra bots, con una recarga a mitad (arranca `pnpm dev` si no está en marcha) |
+| `pnpm --filter @sh/server smoke` | Partida completa por WebSocket contra el Worker local, con desconexión y reconexión |
+
+Para ver cada pantalla: `SHOTS=<carpeta> VIEWPORT=390x844 node e2e/tour.ts 7` juega una partida y guarda una captura de cada pantalla nueva.
+
+### Despliegue
+
+```sh
+pnpm build
+pnpm --filter @sh/server run deploy
 ```
 
-Asegúrate de cambiar:
-- `POSTGRES_PASSWORD`: Password seguro para la base de datos
-- `DATABASE_URL`: Actualizar con el mismo password
-- `SSL_EMAIL`: Tu email para certificados SSL
-- `DOMAIN`: Tu dominio
+Publica en Cloudflare el Worker con las salas y la web compilada, en `secrethitler.lat`. Antes hay que iniciar sesión con `npx wrangler login`.
 
-3. **Inicializar el despliegue:**
-```bash
-./deploy.sh init
+---
+
+## Cómo está hecho
+
+| Capa | Tecnología |
+|---|---|
+| Motor de reglas | TypeScript puro, sin dependencias; estado inmutable y vistas por jugador que solo muestran lo que cada uno puede saber |
+| Servidor | Cloudflare Workers con un Durable Object por sala y WebSockets con hibernación |
+| Protocolo | Mensajes tipados y validados con Zod en el servidor |
+| Web | React 19, Vite, Tailwind CSS 4, Zustand, Motion y React Router |
+| Pruebas | Vitest, Testing Library y Playwright con bots |
+
+```
+config/            reglas del juego (fuente de verdad)
+packages/engine    motor de reglas
+packages/protocol  mensajes cliente ↔ servidor y sus esquemas
+apps/server        Worker + Durable Object por sala
+apps/web           interfaz React
+e2e                pruebas de extremo a extremo y bots
+docs               arquitectura (stack.md) y capturas
 ```
 
-#### Actualizar Cambios
+Más detalle en [`docs/stack.md`](docs/stack.md) y las reglas en [`config/secret-hitler-rules.json`](config/secret-hitler-rules.json).
 
-Para desplegar nuevos cambios:
+---
 
-```bash
-# En tu máquina local
-git add .
-git commit -m "Descripción de cambios"
-git push
-
-# En el servidor
-git pull
-./deploy.sh update
-```
-
-#### Comandos Disponibles
-
-```bash
-./deploy.sh init      # Inicializar despliegue (primera vez)
-./deploy.sh update    # Actualizar y reconstruir servicios
-./deploy.sh restart   # Reiniciar servicios sin reconstruir
-./deploy.sh logs      # Ver logs en tiempo real
-./deploy.sh status    # Ver estado de servicios
-./deploy.sh stop      # Detener todos los servicios
-```
-
-#### Puertos Expuestos
-
-- Frontend: `3000`
-- Backend: `4040`
-- PostgreSQL: `5432` (solo interno)
-
-Para más detalles sobre el despliegue, consulta [DEPLOYMENT_AWS.md](DEPLOYMENT_AWS.md).
-
-## Licencia y Créditos
+## Licencia y créditos
 
 Este proyecto está licenciado bajo [Creative Commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 Basado en:
-- Juego de mesa original: [Secret Hitler](https://secrethitler.com) por Goat, Wolf & Cabbage (© 2016-2020)
-- Implementación web: [Secret Hitler Online](https://github.com/ShrimpCryptid/Secret-Hitler-Online) por ShrimpCryptid (© 2020-2023)
+- Juego de mesa original: [Secret Hitler](https://secrethitler.com) por Goat, Wolf & Cabbage (© 2016-2020), cuyas ilustraciones se adaptan aquí.
+- Implementación web: [Secret Hitler Online](https://github.com/ShrimpCryptid/Secret-Hitler-Online) por ShrimpCryptid (© 2020-2023), de donde vienen los retratos y la estética.
 
 Este proyecto no está afiliado ni respaldado por Goat, Wolf & Cabbage.

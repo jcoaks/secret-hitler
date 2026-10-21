@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* Tokens from the original Secret Hitler Online palette (legacy/frontend/src/variables.css). */
+@theme {
+  --font-display: "Germania One", "Montserrat", serif;
+  --font-sans: "Montserrat", system-ui, sans-serif;
+
+  --color-bg: #4d4945;
+  --color-bg-dark: #372e25;
+  --color-ink: #141414;
+  --color-text: #ffffff;
+  --color-text-2: #bbbbbb;
+  --color-muted: #999999;
+
+  --color-orange: #e05b2b;
+  --color-orange-hover: #e67a53;
+  --color-orange-shadow: #b4431a;
+  --color-liberal: #5a9ba6;
+  --color-liberal-hover: #7abcca;
+  --color-liberal-shadow: #386f8b;
+  --color-fascist: #e05b2b;
+  --color-disabled: #928079;
+  --color-disabled-shadow: #766058;
+
+  --color-paper: #f3e3c3;
+  --color-paper-ink: #372e25;
+  --color-select: #f6b53f;
+  --color-selected: #e46949;
+}
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  img {
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-select);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over every animation */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over every animation */
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
