@@ -7,7 +7,14 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!**/worker-configuration.d.ts", "!legacy"]
+    "includes": [
+      "**",
+      "!**/worker-configuration.d.ts",
+      "!legacy",
+      "!**/*.md",
+      "!pnpm-lock.yaml",
+      "!.vscode"
+    ]
   },
   "formatter": {
     "enabled": true,
