@@ -36,22 +36,28 @@ export function LeaveDialog() {
           };
 
   return (
-    <Dialog open={open} onClose={close} title={copy.title} alert>
+    <Dialog
+      open={open}
+      onClose={close}
+      title={copy.title}
+      alert
+      actions={
+        <>
+          <Button variant="liberal" onClick={close}>
+            {copy.stay.toUpperCase()}
+          </Button>
+          <Button
+            onClick={() => {
+              useRoomStore.getState().leave();
+              close();
+            }}
+          >
+            {copy.leave.toUpperCase()}
+          </Button>
+        </>
+      }
+    >
       <p className="m-0 text-base text-text-2">{copy.text}</p>
-      <div className="mt-1 flex flex-wrap gap-2.5">
-        <Button variant="liberal" className="flex-[1_1_180px]" onClick={close}>
-          {copy.stay.toUpperCase()}
-        </Button>
-        <Button
-          className="flex-[1_1_180px]"
-          onClick={() => {
-            useRoomStore.getState().leave();
-            close();
-          }}
-        >
-          {copy.leave.toUpperCase()}
-        </Button>
-      </div>
     </Dialog>
   );
 }

@@ -30,6 +30,8 @@ export interface PlayerCardProps {
   /** Not chooseable in the current prompt (e.g. term limited). */
   unavailable?: boolean;
   unavailableReason?: string;
+  /** `sm` in prompts: smaller and without the badge row. */
+  size?: 'md' | 'sm';
   className?: string;
 }
 
@@ -48,6 +50,7 @@ export function PlayerCard({
   selected = false,
   unavailable = false,
   unavailableReason,
+  size = 'md',
   className = '',
 }: PlayerCardProps) {
   const dim = dead || unavailable;
@@ -75,7 +78,7 @@ export function PlayerCard({
         className={`absolute top-[6.3%] left-[9%] w-[82%] rounded-[6%] ${dim ? 'brightness-[0.35]' : ''}`}
       />
       <span
-        className={`absolute top-[63%] left-[8%] flex h-[13%] w-[84%] items-center justify-center overflow-hidden text-center font-sans text-[clamp(10px,1.35vw,15px)] leading-tight font-bold break-words ${dim ? 'text-ink' : 'text-bg-dark'}`}
+        className={`absolute top-[63%] left-[8%] flex h-[13%] w-[84%] items-center justify-center overflow-hidden text-center font-sans ${size === 'sm' ? 'text-[11px]' : 'text-[clamp(10px,1.35vw,15px)]'} leading-tight font-bold break-words ${dim ? 'text-ink' : 'text-bg-dark'}`}
       >
         {name}
       </span>
@@ -83,7 +86,7 @@ export function PlayerCard({
         <span className="absolute top-[77%] left-[8%] flex w-[84%] items-center gap-[6%]">
           <img src={art.roleIcon[role]} alt="" className="w-[30%]" />
           <span
-            className={`font-sans text-[clamp(9px,1.2vw,14px)] font-bold ${role === 'liberal' ? 'text-liberal' : 'text-orange'} ${dim ? 'opacity-50' : ''}`}
+            className={`font-sans ${size === 'sm' ? 'text-[10px]' : 'text-[clamp(9px,1.2vw,14px)]'} font-bold ${role === 'liberal' ? 'text-liberal' : 'text-orange'} ${dim ? 'opacity-50' : ''}`}
           >
             {ROLE_NAME[role]}
           </span>
@@ -114,9 +117,11 @@ export function PlayerCard({
           />
         )}
       </AnimatePresence>
-      {dead && (
-        <span className="absolute inset-0 flex items-center justify-center font-display text-[clamp(14px,2.2vw,24px)] text-muted">
-          EJECUTADO
+      {(dead || (unavailable && unavailableReason)) && (
+        <span
+          className={`absolute inset-x-[6%] top-[22%] flex items-center justify-center text-center font-display leading-none text-text-2 ${size === 'sm' ? 'text-[13px]' : 'text-[clamp(14px,2.2vw,24px)]'}`}
+        >
+          {dead ? 'EJECUTADO' : unavailableReason?.toUpperCase()}
         </span>
       )}
       {offline && !dead && (
@@ -136,20 +141,24 @@ export function PlayerCard({
   }`;
 
   return (
-    <div className={`flex w-[clamp(72px,10.5vw,118px)] flex-col items-center gap-1 ${className}`}>
-      <span
-        className={`h-5 rounded px-1.5 font-sans text-[11px] leading-5 font-bold tracking-wide uppercase ${
-          badge === 'president'
-            ? 'bg-orange text-white'
-            : badge
-              ? 'bg-liberal text-white'
-              : isYou
-                ? 'text-text-2'
-                : 'invisible'
-        }`}
-      >
-        {badge ? BADGE_TEXT[badge] : 'Tú'}
-      </span>
+    <div
+      className={`flex flex-col items-center gap-1 ${size === 'sm' ? 'w-[min(100px,max(64px,10vw),14dvh)]' : 'w-[clamp(72px,10.5vw,118px)]'} ${className}`}
+    >
+      {size === 'md' && (
+        <span
+          className={`h-5 rounded px-1.5 font-sans text-[11px] leading-5 font-bold tracking-wide uppercase ${
+            badge === 'president'
+              ? 'bg-orange text-white'
+              : badge
+                ? 'bg-liberal text-white'
+                : isYou
+                  ? 'text-text-2'
+                  : 'invisible'
+          }`}
+        >
+          {badge ? BADGE_TEXT[badge] : 'Tú'}
+        </span>
+      )}
       {onSelect && !unavailable && !dead ? (
         <button
           type="button"

@@ -49,6 +49,8 @@ export async function step(page: Page): Promise<string | null> {
 
   if (await visible(page, 'ABRIR SOBRE')) {
     await page.getByRole('button', { name: 'ABRIR SOBRE' }).click();
+    // The card slides out before the role sheet appears.
+    await page.getByRole('button', { name: 'ENTENDIDO' }).waitFor();
     return 'envelope';
   }
   if (await visible(page, 'ENTENDIDO')) {

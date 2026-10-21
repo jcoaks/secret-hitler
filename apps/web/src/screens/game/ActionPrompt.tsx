@@ -47,18 +47,31 @@ function PromptDialog({
   title,
   width,
   children,
+  actions,
 }: {
   title: string;
   width: number;
   children: ReactNode;
+  actions?: ReactNode;
 }) {
   const hide = useContext(HideContext);
   return (
-    <Dialog open alert title={title} width={width} onClose={hide}>
+    <Dialog
+      open
+      alert
+      title={title}
+      width={width}
+      onClose={hide}
+      actions={
+        <>
+          {actions}
+          <Button variant="ghost" size="sm" onClick={hide}>
+            Ver la mesa
+          </Button>
+        </>
+      }
+    >
       {children}
-      <Button variant="ghost" size="sm" onClick={hide}>
-        Ver la mesa
-      </Button>
     </Dialog>
   );
 }
@@ -168,7 +181,19 @@ function PlayerChoice({
   const others = game.players.filter((p) => p.id !== game.you.id);
 
   return (
-    <PromptDialog title={title} width={760}>
+    <PromptDialog
+      title={title}
+      width={760}
+      actions={
+        <Button
+          size="lg"
+          disabled={disabled || selected === null}
+          onClick={() => selected && send(action(selected))}
+        >
+          {confirm}
+        </Button>
+      }
+    >
       <p className="m-0 text-[16px] text-text-2">{text}</p>
       <ul className="m-0 flex list-none flex-wrap justify-center gap-2 p-0">
         {others.map((player) => {
@@ -185,18 +210,12 @@ function PlayerChoice({
                 unavailableReason={reason}
                 selected={selected === player.id}
                 onSelect={() => setSelected(player.id)}
+                size="sm"
               />
             </li>
           );
         })}
       </ul>
-      <Button
-        size="lg"
-        disabled={disabled || selected === null}
-        onClick={() => selected && send(action(selected))}
-      >
-        {confirm}
-      </Button>
     </PromptDialog>
   );
 }
@@ -246,7 +265,7 @@ function VoteCard(props: { src: string; label: string; disabled: boolean; onClic
       disabled={props.disabled}
       onClick={props.onClick}
       aria-label={props.label}
-      className="w-[clamp(120px,24vw,220px)] cursor-pointer rounded-[14px] border-0 bg-transparent p-0 transition-transform hover:-translate-y-1 hover:shadow-[0_0_0_4px_var(--color-select)] disabled:cursor-not-allowed disabled:opacity-60"
+      className="w-[min(220px,max(110px,24vw),30dvh)] cursor-pointer rounded-[14px] border-0 bg-transparent p-0 transition-transform hover:-translate-y-1 hover:shadow-[0_0_0_4px_var(--color-select)] disabled:cursor-not-allowed disabled:opacity-60"
     >
       <img src={props.src} alt="" className="block w-full" />
     </button>
@@ -274,7 +293,7 @@ function PolicyCards({
             aria-label={label}
             aria-pressed={selected === index}
             onClick={() => onSelect(index)}
-            className={`w-[clamp(84px,18vw,150px)] cursor-pointer rounded-[8%] border-0 bg-transparent p-0 transition-[transform,box-shadow] ${
+            className={`w-[min(150px,max(84px,18vw),26dvh)] cursor-pointer rounded-[8%] border-0 bg-transparent p-0 transition-[transform,box-shadow] ${
               selected === index
                 ? '-translate-y-2 shadow-[0_0_0_4px_var(--color-selected)]'
                 : 'hover:-translate-y-1 hover:shadow-[0_0_0_4px_var(--color-select)]'
@@ -283,8 +302,13 @@ function PolicyCards({
             <img src={art.policy[policy]} alt="" className="block w-full rounded-[6%]" />
           </button>
         ) : (
-          // biome-ignore lint/suspicious/noArrayIndexKey: the peek is ordered by position
-          <div key={index} role="img" aria-label={label} className="w-[clamp(84px,18vw,150px)]">
+          <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: the peek is ordered by position
+            key={index}
+            role="img"
+            aria-label={label}
+            className="w-[min(150px,max(84px,18vw),26dvh)]"
+          >
             <img src={art.policy[policy]} alt="" className="block w-full rounded-[6%]" />
           </div>
         );
@@ -303,6 +327,27 @@ function PolicyPrompt({ game, mode }: { game: PlayerView; mode: 'discard' | 'ena
     <PromptDialog
       title={mode === 'discard' ? 'SESIÓN LEGISLATIVA' : 'APRUEBA UNA POLÍTICA'}
       width={640}
+      actions={
+        <>
+          <Button
+            size="lg"
+            disabled={disabled || selected === null}
+            onClick={() => selected !== null && send({ type: mode, index: selected })}
+          >
+            {mode === 'discard' ? 'DESCARTAR' : 'APROBAR'}
+          </Button>
+          {canVeto && (
+            <Button
+              size="lg"
+              variant="liberal"
+              disabled={disabled}
+              onClick={() => send({ type: 'propose_veto' })}
+            >
+              PROPONER VETO
+            </Button>
+          )}
+        </>
+      }
     >
       <p className="m-0 text-[16px] text-text-2">
         {mode === 'discard'
@@ -310,25 +355,6 @@ function PolicyPrompt({ game, mode }: { game: PlayerView; mode: 'discard' | 'ena
           : 'Elige la política que se APRUEBA. La otra se descarta.'}
       </p>
       <PolicyCards policies={hand} selected={selected} onSelect={setSelected} />
-      <div className="flex flex-wrap justify-center gap-3">
-        <Button
-          size="lg"
-          disabled={disabled || selected === null}
-          onClick={() => selected !== null && send({ type: mode, index: selected })}
-        >
-          {mode === 'discard' ? 'DESCARTAR' : 'APROBAR'}
-        </Button>
-        {canVeto && (
-          <Button
-            size="lg"
-            variant="liberal"
-            disabled={disabled}
-            onClick={() => send({ type: 'propose_veto' })}
-          >
-            PROPONER VETO
-          </Button>
-        )}
-      </div>
       {mode === 'enact' && (
         <p className="m-0 text-[13px] text-text-2">
           {game.vetoDenied
@@ -347,28 +373,33 @@ function VetoPrompt({ game }: { game: PlayerView }) {
   const { disabled, send } = useSend();
   const chancellor = room.players.find((p) => p.id === game.chancellorId)?.name ?? 'El canciller';
   return (
-    <PromptDialog title="PROPUESTA DE VETO" width={560}>
+    <PromptDialog
+      title="PROPUESTA DE VETO"
+      width={560}
+      actions={
+        <>
+          <Button
+            size="lg"
+            variant="liberal"
+            disabled={disabled}
+            onClick={() => send({ type: 'answer_veto', accept: true })}
+          >
+            ACEPTAR VETO
+          </Button>
+          <Button
+            size="lg"
+            disabled={disabled}
+            onClick={() => send({ type: 'answer_veto', accept: false })}
+          >
+            RECHAZAR
+          </Button>
+        </>
+      }
+    >
       <p className="m-0 text-[16px] text-text-2">
         {chancellor} quiere vetar esta agenda. Si aceptas, se descartan ambas políticas y el
         contador electoral avanza. Si no, deberá aprobar una.
       </p>
-      <div className="flex flex-wrap justify-center gap-3">
-        <Button
-          size="lg"
-          variant="liberal"
-          disabled={disabled}
-          onClick={() => send({ type: 'answer_veto', accept: true })}
-        >
-          ACEPTAR VETO
-        </Button>
-        <Button
-          size="lg"
-          disabled={disabled}
-          onClick={() => send({ type: 'answer_veto', accept: false })}
-        >
-          RECHAZAR
-        </Button>
-      </div>
     </PromptDialog>
   );
 }
@@ -376,14 +407,19 @@ function VetoPrompt({ game }: { game: PlayerView }) {
 function PeekPrompt({ game }: { game: PlayerView }) {
   const { disabled, send } = useSend();
   return (
-    <PromptDialog title="ESPIAR POLÍTICAS" width={640}>
+    <PromptDialog
+      title="ESPIAR POLÍTICAS"
+      width={640}
+      actions={
+        <Button size="lg" disabled={disabled} onClick={() => send({ type: 'end_peek' })}>
+          ENTENDIDO
+        </Button>
+      }
+    >
       <p className="m-0 text-[16px] text-text-2">
         Estas son las próximas tres políticas del mazo, de izquierda a derecha. Solo tú las ves.
       </p>
       <PolicyCards policies={game.you.peek ?? []} />
-      <Button size="lg" disabled={disabled} onClick={() => send({ type: 'end_peek' })}>
-        ENTENDIDO
-      </Button>
     </PromptDialog>
   );
 }

@@ -74,7 +74,17 @@ function AcknowledgedAnnouncement({
   onDone: () => void;
 }) {
   return (
-    <Dialog open alert title={announcement.title} onClose={onDone}>
+    <Dialog
+      open
+      alert
+      title={announcement.title}
+      onClose={onDone}
+      actions={
+        <Button size="lg" onClick={onDone}>
+          ENTENDIDO
+        </Button>
+      }
+    >
       {announcement.party && (
         <motion.img
           src={art.membership[announcement.party]}
@@ -82,13 +92,10 @@ function AcknowledgedAnnouncement({
           initial={{ rotateY: 90 }}
           animate={{ rotateY: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-[clamp(140px,30vw,220px)]"
+          className="w-[min(220px,max(140px,30vw),34dvh)]"
         />
       )}
       {announcement.text && <p className="m-0 text-[16px] text-text-2">{announcement.text}</p>}
-      <Button size="lg" onClick={onDone}>
-        ENTENDIDO
-      </Button>
     </Dialog>
   );
 }

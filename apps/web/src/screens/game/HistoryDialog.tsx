@@ -64,7 +64,13 @@ export function HistoryDialog({
   const nameOf = (id: PlayerId) => game.players.find((p) => p.id === id)?.name ?? '¿?';
   const entries = game.chronicle.map((entry, index) => ({ entry, index })).reverse();
   return (
-    <Dialog open={open} onClose={onClose} title="HISTORIAL" width={680}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      title="HISTORIAL"
+      width={680}
+      actions={<Button onClick={onClose}>CERRAR</Button>}
+    >
       {entries.length === 0 ? (
         <p className="m-0 text-text-2">Todavía no ha pasado nada.</p>
       ) : (
@@ -103,7 +109,6 @@ export function HistoryDialog({
           })}
         </ol>
       )}
-      <Button onClick={onClose}>CERRAR</Button>
     </Dialog>
   );
 }

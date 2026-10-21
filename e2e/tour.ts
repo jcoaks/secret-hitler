@@ -25,7 +25,7 @@ async function shot(name: string): Promise<void> {
   seen.add(name);
   await page.waitForTimeout(400);
   const file = `${SHOTS}/${String(count++).padStart(2, '0')}-${name.replace(/\W+/g, '_')}.png`;
-  await page.screenshot({ path: file, fullPage: true });
+  await page.screenshot({ path: file, fullPage: process.env.FULL_PAGE === '1' });
 }
 
 await page.goto('/');
