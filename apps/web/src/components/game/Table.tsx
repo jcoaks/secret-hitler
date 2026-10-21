@@ -47,14 +47,15 @@ export function StatusBar({ children }: { children: string }) {
 
 /** Draw pile, the two boards and the discard pile. */
 export function BoardArea({ game }: { game: PlayerView }) {
+  // Proportional columns: each pile is 14.5% of the board's width, so the card on it (69% of the
+  // pile) matches a policy on the board (10% of the board). On phones the piles go below.
   return (
     <section
       aria-label="Tablero"
-      className="mx-auto flex w-full max-w-[1100px] flex-wrap items-start justify-between gap-x-[clamp(6px,1.5vw,20px)] gap-y-3 px-3 py-4 sm:flex-nowrap sm:justify-center"
+      className="mx-auto grid w-full max-w-[1180px] grid-cols-2 items-start gap-x-[clamp(8px,1.5vw,20px)] gap-y-3 px-3 py-4 sm:grid-cols-[14.5fr_100fr_14.5fr]"
     >
       <Deck kind="draw" count={game.drawCount} />
-      {/* On phones the boards take the full width and the piles sit below them. */}
-      <div className="order-first w-full sm:order-none">
+      <div className="order-first col-span-2 sm:order-none sm:col-span-1">
         <Boards game={game} />
       </div>
       <Deck kind="discard" count={game.discardCount} />

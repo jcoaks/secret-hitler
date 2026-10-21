@@ -34,7 +34,7 @@ function PolicyTrack({ policy, enacted }: { policy: Policy; enacted: number }) {
 export function Boards({ game }: { game: PlayerView }) {
   const nextPower = game.board.powers[game.enacted.fascist] ?? null;
   return (
-    <div className="flex w-full max-w-[860px] flex-col gap-2">
+    <div className="flex w-full flex-col gap-2">
       <div className="relative">
         <img
           src={art.boardLiberal}
@@ -77,29 +77,35 @@ export function Deck({ kind, count }: { kind: 'draw' | 'discard'; count: number 
   const label = kind === 'draw' ? 'Mazo de robo' : 'Descartes';
   return (
     <div
-      className="relative w-[clamp(56px,9vw,96px)]"
-      role="img"
-      aria-label={`${label}: ${count} cartas`}
+      className={`flex w-[min(22vw,96px)] flex-col items-center gap-1 sm:w-full ${kind === 'draw' ? 'justify-self-start' : 'justify-self-end'}`}
     >
-      <img src={kind === 'draw' ? art.boardDraw : art.boardDiscard} alt="" className="w-full" />
-      {Array.from({ length: Math.min(count, 3) }, (_, i) => (
+      <div
+        className="@container relative w-full"
+        role="img"
+        aria-label={`${label}: ${count} cartas`}
+      >
         <img
-          // biome-ignore lint/suspicious/noArrayIndexKey: a fixed stack of card backs
-          key={i}
-          src={art.boardPolicyBack}
+          src={kind === 'draw' ? art.boardDraw : art.boardDiscard}
           alt=""
-          className="absolute left-[16%] w-[69%] drop-shadow"
-          style={{ top: `${9 - i * 2}%` }}
+          className="block w-full"
         />
-      ))}
-      {count > 0 && (
-        <span className="absolute top-[52%] left-[16%] w-[69%] text-center font-display text-[clamp(18px,3vw,30px)] text-white drop-shadow">
-          {count}
-        </span>
-      )}
-      <span className="mt-1 block text-center font-sans text-[11px] font-bold text-text-2">
-        {label}
-      </span>
+        {Array.from({ length: Math.min(count, 3) }, (_, i) => (
+          <img
+            // biome-ignore lint/suspicious/noArrayIndexKey: a fixed stack of card backs
+            key={i}
+            src={art.boardPolicyBack}
+            alt=""
+            className="absolute left-[16%] w-[69%] drop-shadow"
+            style={{ top: `${9 - i * 2}%` }}
+          />
+        ))}
+        {count > 0 && (
+          <span className="absolute top-[52%] left-[16%] w-[69%] text-center font-display text-[26cqw] leading-none text-white drop-shadow">
+            {count}
+          </span>
+        )}
+      </div>
+      <span className="text-center font-sans text-[12px] font-bold text-text-2">{label}</span>
     </div>
   );
 }
