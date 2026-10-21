@@ -1,12 +1,10 @@
-import type { Party, Policy, Power, Role, WinReason } from '@sh/engine';
+import type { Policy, Power, Role, WinReason } from '@sh/engine';
 
 export const ROLE_NAME: Record<Role, string> = {
   liberal: 'Liberal',
   fascist: 'Fascista',
   hitler: 'Hitler',
 };
-
-export const PARTY_NAME: Record<Party, string> = { liberal: 'Liberal', fascist: 'Fascista' };
 
 export const POLICY_NAME: Record<Policy, string> = { liberal: 'liberal', fascist: 'fascista' };
 
@@ -15,13 +13,6 @@ export const POWER_NAME: Record<Power, string> = {
   peek: 'Espiar políticas',
   special_election: 'Elección especial',
   execution: 'Ejecución',
-};
-
-export const POWER_HINT: Record<Power, string> = {
-  investigate: 'El presidente investiga la afiliación de un jugador.',
-  peek: 'El presidente mira las tres próximas políticas.',
-  special_election: 'El presidente elige al siguiente candidato a presidente.',
-  execution: 'El presidente debe ejecutar a un jugador.',
 };
 
 export const WIN_TEXT: Record<WinReason, string> = {

@@ -10,7 +10,6 @@ import boardPolicyBack from '../assets/board-policy.webp';
 import boardPolicyFascist from '../assets/board-policy-fascist.webp';
 import boardPolicyLiberal from '../assets/board-policy-liberal.webp';
 import boardTracker from '../assets/board-tracker.webp';
-import membershipBack from '../assets/party-membership.webp';
 import membershipFascist from '../assets/party-membership-fascist.webp';
 import membershipLiberal from '../assets/party-membership-liberal.webp';
 import playerBase from '../assets/player-base.webp';
@@ -71,7 +70,6 @@ export const art = {
     Party,
     string
   >,
-  membershipBack,
   playerBase,
   playerBaseUnselectable,
   roleIcon: { liberal: iconLiberal, fascist: iconFascist, hitler: iconHitler } satisfies Record<
