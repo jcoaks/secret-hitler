@@ -3,9 +3,11 @@ import type { Page } from '@playwright/test';
 
 const CONFIRM = /^(NOMINAR|INVESTIGAR|ELEGIR|EJECUTAR|DESCARTAR|APROBAR)$/;
 
+/** A visible button that can be pressed now (prompts disable theirs while the move is in flight). */
 const visible = (page: Page, name: string | RegExp) =>
   page
     .getByRole('button', { name, exact: typeof name === 'string' })
+    .and(page.locator(':enabled'))
     .first()
     .isVisible()
     .catch(() => false);
@@ -67,9 +69,21 @@ export async function step(page: Page): Promise<string | null> {
   }
   const option = dialog.locator('button[aria-pressed]:not([disabled])').first();
   if (await option.isVisible().catch(() => false)) {
-    await option.click();
-    await dialog.locator('button:enabled', { hasText: CONFIRM }).first().click();
-    return title;
+    if (
+      !(await option.click({ timeout: 1500 }).then(
+        () => true,
+        () => false,
+      ))
+    )
+      return null;
+    // The prompt can be replaced in between (a new view arrived): the next step retries.
+    const confirmed = await dialog
+      .locator('button:enabled', { hasText: CONFIRM })
+      .first()
+      .click({ timeout: 1500 })
+      .then(() => true)
+      .catch(() => false);
+    return confirmed ? title : null;
   }
   return null;
 }

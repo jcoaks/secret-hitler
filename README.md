@@ -88,6 +88,8 @@ pnpm --filter @sh/e2e fill <CÓDIGO> [bots=4] [ms entre jugadas=1500]
 | `pnpm e2e` | Partidas completas en Chromium: 5 y 7 jugadores con una recarga a mitad, y una persona contra 4 bots del servidor (arranca `pnpm dev` si no está en marcha) |
 | `pnpm --filter @sh/server smoke` | Partida completa por WebSocket contra el Worker local, con desconexión y reconexión |
 
+Las pruebas e2e también se pueden lanzar contra un despliegue: `BASE_URL=https://secrethitler.lat BASE=https://secrethitler.lat pnpm e2e`.
+
 Para ver cada pantalla: `SHOTS=<carpeta> VIEWPORT=390x844 node e2e/tour.ts 7` juega una partida y guarda una captura de cada pantalla nueva.
 
 ### Despliegue
