@@ -13,7 +13,8 @@
       "!legacy",
       "!**/*.md",
       "!pnpm-lock.yaml",
-      "!.vscode"
+      "!.vscode",
+      "!**/*.svg"
     ]
   },
   "formatter": {
