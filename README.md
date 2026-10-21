@@ -18,7 +18,7 @@ creas una sala, compartes el enlace y empieza la legislatura.
 ## Cómo se juega
 
 1. **Crea una sala** con tu nombre y comparte el enlace (o el código de 6 caracteres).
-2. **Elige tu retrato** y marca que estás listo. Con 5 a 10 jugadores, el anfitrión empieza.
+2. **Elige tu retrato** y marca que estás listo. Con 5 a 10 jugadores, el anfitrión empieza. Si faltan personas, el anfitrión puede **añadir bots**.
 3. **Abre tu sobre.** Eres liberal, fascista o Hitler; los fascistas se conocen entre sí.
 4. **Forma gobierno:** el presidente nomina canciller y todos votan ¡Ja! o Nein.
 5. **Legisla:** el presidente descarta una política y el canciller aprueba otra. Algunas políticas fascistas dan poderes: investigar, espiar el mazo, elección especial o ejecutar.
@@ -42,7 +42,8 @@ Las reglas completas están dentro del juego, en **Cómo se juega**.
       <ul>
         <li>Los tres tableros (5–6, 7–8 y 9–10 jugadores) con todos sus poderes y el veto</li>
         <li>Cada jugador solo recibe lo que puede saber: ni cartas ajenas ni votos antes de tiempo</li>
-        <li>Historial de gobiernos, votos y políticas</li>
+        <li>Bots que razonan con lo que ven, mienten si son fascistas y comentan la partida en globos de texto</li>
+        <li>Historial de gobiernos, votos, políticas y comentarios</li>
         <li>Si alguien pierde la conexión, la partida se pausa y su asiento le espera</li>
         <li>Recargar la página no te saca de la mesa</li>
         <li>Funciona en escritorio y en el móvil, todo en español</li>
@@ -84,7 +85,7 @@ pnpm --filter @sh/e2e fill <CÓDIGO> [bots=4] [ms entre jugadas=1500]
 | `pnpm typecheck` | TypeScript en todos los paquetes |
 | `pnpm test` | Pruebas unitarias: motor (incluidas 1.800 partidas aleatorias), protocolo, salas y web |
 | `pnpm build` | Compila la web en `apps/web/dist` |
-| `pnpm e2e` | Partidas completas de 5 y 7 jugadores en Chromium contra bots, con una recarga a mitad (arranca `pnpm dev` si no está en marcha) |
+| `pnpm e2e` | Partidas completas en Chromium: 5 y 7 jugadores con una recarga a mitad, y una persona contra 4 bots del servidor (arranca `pnpm dev` si no está en marcha) |
 | `pnpm --filter @sh/server smoke` | Partida completa por WebSocket contra el Worker local, con desconexión y reconexión |
 
 Para ver cada pantalla: `SHOTS=<carpeta> VIEWPORT=390x844 node e2e/tour.ts 7` juega una partida y guarda una captura de cada pantalla nueva.

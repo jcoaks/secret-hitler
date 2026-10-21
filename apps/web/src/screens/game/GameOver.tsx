@@ -34,6 +34,7 @@ function Team({ party, room, game }: { party: Party; room: RoomView; game: Playe
               role={game.roles?.[player.id] ?? null}
               dead={game.deadIds.includes(player.id)}
               isYou={player.id === game.you.id}
+              bot={room.players.find((p) => p.id === player.id)?.bot}
               size="sm"
             />
           </li>

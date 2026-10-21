@@ -1,3 +1,5 @@
+export { type BotNotes, beliefsFor, chooseBotAction, emptyBotNotes } from './bot';
+export { botRemark } from './bot-talk';
 export { alivePlayers, applyAction, eligibleChancellors, isAlive, vetoUnlocked } from './game';
 export { type Random, randomInt, seededRandom, shuffle } from './random';
 export {

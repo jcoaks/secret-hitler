@@ -15,6 +15,8 @@ import {
   disconnectSeat,
   findSeatByTokenHash,
   handleMessage,
+  pendingBot,
+  playBot,
   type RoomContext,
   type RoomData,
   roomInfo,
@@ -23,6 +25,13 @@ import {
 
 /** Rooms with no activity for this long are deleted. */
 const ROOM_TTL_MS = 6 * 60 * 60 * 1000;
+/**
+ * Bots wait before moving, so people can follow: a quick beat for votes, longer for decisions,
+ * and extra time after something happened, while the table watches the announcement.
+ */
+const BOT_VOTE_DELAY_MS = 900;
+const BOT_MOVE_DELAY_MS = 2200;
+const BOT_AFTER_EVENT_MS = 4500;
 /** Per-connection rate limit. */
 const RATE_WINDOW_MS = 10_000;
 const RATE_MAX_MESSAGES = 40;
@@ -115,13 +124,20 @@ export class Room extends DurableObject<Env> {
   override async alarm(): Promise<void> {
     const data = this.data;
     if (!data) return;
+    if (pendingBot(data) && this.ctx.getWebSockets().length > 0) {
+      if (Date.now() >= (data.botDueAt ?? 0) && playBot(data, this.context())) {
+        data.botDueAt = null;
+        await this.commit();
+        return;
+      }
+    }
     const idle = Date.now() - data.lastActivity;
     if (idle >= ROOM_TTL_MS && this.ctx.getWebSockets().length === 0) {
       this.data = null;
       await this.ctx.storage.deleteAll();
       return;
     }
-    await this.ctx.storage.setAlarm(data.lastActivity + ROOM_TTL_MS);
+    await this.schedule();
   }
 
   // --- Internals ---------------------------------------------------------------
@@ -188,8 +204,36 @@ export class Room extends DurableObject<Env> {
 
   private async save(): Promise<void> {
     if (!this.data) return;
+    this.planBotMove(this.data);
     await this.ctx.storage.put('room', this.data);
-    await this.ctx.storage.setAlarm(this.data.lastActivity + ROOM_TTL_MS);
+    await this.schedule();
+  }
+
+  /** When the next bot should move, paced to what just happened at the table. */
+  private planBotMove(data: RoomData): void {
+    const botId = pendingBot(data);
+    if (!botId || !data.game) {
+      data.botDueAt = null;
+      return;
+    }
+    const events = data.game.chronicle.length;
+    const newEvent = events !== data.botSeenEvents;
+    data.botSeenEvents = events;
+    if (data.botDueAt && !newEvent) return;
+    const delay =
+      (data.game.phase === 'election' ? BOT_VOTE_DELAY_MS : BOT_MOVE_DELAY_MS) +
+      (newEvent ? BOT_AFTER_EVENT_MS : 0) +
+      Math.floor(Math.random() * 600);
+    data.botDueAt = Date.now() + delay;
+  }
+
+  /** One alarm serves both the next bot move and the cleanup of idle rooms. */
+  private async schedule(): Promise<void> {
+    const data = this.data;
+    if (!data) return;
+    const cleanup = data.lastActivity + ROOM_TTL_MS;
+    const botAt = data.botDueAt && pendingBot(data) ? data.botDueAt : null;
+    await this.ctx.storage.setAlarm(botAt ? Math.min(botAt, cleanup) : cleanup);
   }
 
   private context(excluding?: WebSocket): RoomContext {

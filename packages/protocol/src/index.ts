@@ -76,8 +76,19 @@ export interface RoomPlayer {
   ready: boolean;
   connected: boolean;
   portrait: number;
+  /** A computer player added by the host. */
+  bot: boolean;
   /** Left a game in progress; their seat stays until the game ends. */
   left: boolean;
+}
+
+/** Something a bot said at the table. */
+export interface ChatLine {
+  id: number;
+  playerId: string;
+  text: string;
+  /** Chronicle length right after the event it comments on, to place it in the history. */
+  chronicle: number;
 }
 
 export interface RoomView {
@@ -90,6 +101,8 @@ export interface RoomView {
   setup: { ok: true } | { ok: false; code: RoomErrorCode; message: string };
   canStart: boolean;
   game: PlayerView | null;
+  /** The latest bot remarks, oldest first. */
+  chat: ChatLine[];
   pause: { disconnectedIds: string[]; since: number; hostCanEndAt: number } | null;
 }
 

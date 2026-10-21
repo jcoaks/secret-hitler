@@ -47,3 +47,29 @@ for (const players of [5, 7]) {
     }
   });
 }
+
+test('una persona contra 4 bots del servidor, que comentan la partida', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(String(error)));
+  await createRoom(page, 'Juan');
+  for (let i = 0; i < 4; i++) await page.getByRole('button', { name: '+ AÑADIR BOT' }).click();
+  await expect(page.getByText('JUGADORES (5/10)')).toBeVisible();
+  await page.getByRole('button', { name: 'ESTOY LISTO' }).click();
+  const start = page.getByRole('button', { name: 'EMPEZAR PARTIDA' });
+  await expect(start).toBeEnabled();
+  await start.click();
+
+  let heardABot = false;
+  for (let i = 0; i < 3000 && !(await gameOver(page)); i++) {
+    await step(page);
+    heardABot ||= await page
+      .getByRole('status', { name: / dice: / })
+      .first()
+      .isVisible()
+      .catch(() => false);
+    await page.waitForTimeout(100);
+  }
+  await expect(page.getByRole('dialog', { name: /Victoria/ })).toBeVisible();
+  expect(heardABot).toBe(true);
+  expect(errors).toEqual([]);
+});

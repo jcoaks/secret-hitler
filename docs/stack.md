@@ -28,6 +28,14 @@ Migrado el 2026-10-21 desde Java (Javalin) + Create React App al stack de Avalon
 - La `chronicle` es el registro público de la partida (elecciones con sus votos, políticas, vetos, poderes). La web la usa para los anuncios y el historial.
 - Pruebas de 5 a 10 jugadores, cada regla del reglamento oficial (límites de mandato, caos, veto, elección especial, investigación, ejecución) y 1.800 partidas aleatorias que llegan a las cuatro formas de terminar sin perder ninguna carta.
 
+## Bots (`packages/engine/src/bot.ts`, `bot-talk.ts`)
+
+- Adaptados del `CpuPlayer` de Secret Hitler Online, pero cada bot decide **solo con su propia vista** (`viewFor`): sabe exactamente lo que sabría una persona en su asiento.
+- Razonan con el registro público y con lo que vieron: gobiernos que aprueban fascistas, quién les pasó dos fascistas, quién eligió la fascista de una mano mixta, quién vota gobiernos sospechosos, y quién queda confirmado como «no Hitler» al salir canciller con tres fascistas en la mesa.
+- Los liberales descartan siempre la fascista; los fascistas a veces aprueban una liberal al principio para ganar confianza y eligen a Hitler canciller en cuanto pueden ganar así.
+- `botRemark` decide qué dice cada bot tras cada suceso: los implicados declaran su mano o su investigación (los fascistas mienten para cubrirse) y algunos más comentan sus sospechas. Como mucho dos comentarios por suceso.
+- En simulaciones con bots en ambos bandos, los liberales ganan entre un 37 % y un 46 %, cerca de las partidas reales.
+
 ## Servidor (`apps/server`)
 
 Igual que en Avalon:
@@ -36,6 +44,7 @@ Igual que en Avalon:
 - `room-core.ts` es puro y se prueba sin Cloudflare; `room.ts` solo adapta WebSockets, almacenamiento y alarmas.
 - Las desconexiones pausan la partida (salvo la de un jugador ya ejecutado); el anfitrión puede terminarla tras 120 s de pausa. Una alarma borra las salas sin actividad durante 6 h.
 - Al sentarse, cada jugador recibe un retrato libre al azar y puede cambiarlo en la sala de espera.
+- El anfitrión puede añadir bots (`add_bot`) y quitarlos como a cualquiera. Siempre están listos y conectados, no pausan la partida ni heredan el anfitrión. La alarma del Durable Object mueve al bot que tenga turno, con pausas pensadas para que se vean las animaciones, y guarda sus comentarios en `chat`.
 
 ### API
 
@@ -45,7 +54,7 @@ Igual que en Avalon:
 | `GET /api/rooms/:code` | Estado público: `{code, status, playerCount, joinable, playerNames, hostName}`; 404 si no existe |
 | `GET /api/rooms/:code/ws` | WebSocket. Primer mensaje: `join` con `name` (asiento nuevo) o `seatToken` (reconexión) |
 
-Mensajes del cliente: `join`, `set_ready`, `set_portrait`, `kick`, `start`, `action`, `leave`, `end_game`, `new_game`. Acciones de juego: `nominate`, `vote`, `discard`, `enact`, `propose_veto`, `answer_veto`, `investigate`, `end_peek`, `special_election`, `execute`. Del servidor: `welcome`, `room`, `error`, `kicked`.
+Mensajes del cliente: `join`, `set_ready`, `set_portrait`, `kick`, `add_bot`, `start`, `action`, `leave`, `end_game`, `new_game`. Acciones de juego: `nominate`, `vote`, `discard`, `enact`, `propose_veto`, `answer_veto`, `investigate`, `end_peek`, `special_election`, `execute`. Del servidor: `welcome`, `room`, `error`, `kicked`.
 
 ## Seguridad
 

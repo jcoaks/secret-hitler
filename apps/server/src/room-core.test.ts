@@ -1,4 +1,4 @@
-import { seededRandom } from '@sh/engine';
+import { chooseBotAction, emptyBotNotes, seededRandom, viewFor } from '@sh/engine';
 import { HOST_CAN_END_AFTER_MS } from '@sh/protocol';
 import { describe, expect, it } from 'vitest';
 import {
@@ -7,6 +7,8 @@ import {
   createRoom,
   disconnectSeat,
   handleMessage,
+  pendingBot,
+  playBot,
   type RoomContext,
   type RoomData,
   roomInfo,
@@ -238,5 +240,66 @@ describe('partida', () => {
     });
     expect(data.seats).toHaveLength(4);
     expect(data.hostId).toBe('s2');
+  });
+});
+
+describe('bots', () => {
+  function lobbyWithBots(people: number, bots: number) {
+    const room = lobby(people);
+    for (let i = 0; i < bots; i++) {
+      expectOk(handleMessage(room.data, 's1', { type: 'add_bot' }, ctx(room.all)));
+    }
+    return room;
+  }
+
+  it('solo el anfitrión añade bots, que están siempre listos y conectados', () => {
+    const { data, all } = lobbyWithBots(1, 4);
+    expect(codeOf(handleMessage(data, 's1', { type: 'add_bot' }, ctx(all)))).toBeNull();
+    const view = roomView(data, 's1', ctx(all));
+    const bots = view.players.filter((p) => p.bot);
+    expect(bots).toHaveLength(5);
+    expect(bots.every((b) => b.ready && b.connected)).toBe(true);
+    expect(new Set(view.players.map((p) => p.name)).size).toBe(6);
+  });
+
+  it('no deja añadir bots a otros ni pasar de 10', () => {
+    const { data, all } = lobbyWithBots(2, 8);
+    expect(codeOf(handleMessage(data, 's2', { type: 'add_bot' }, ctx(all)))).toBe('not_host');
+    expect(codeOf(handleMessage(data, 's1', { type: 'add_bot' }, ctx(all)))).toBe('room_full');
+  });
+
+  it('una persona y cuatro bots juegan una partida completa', () => {
+    const { data, all } = lobbyWithBots(1, 4);
+    expectOk(handleMessage(data, 's1', { type: 'set_ready', ready: true }, ctx(all)));
+    expect(roomView(data, 's1', ctx(all)).canStart).toBe(true);
+    expectOk(handleMessage(data, 's1', { type: 'start' }, ctx(all)));
+    const random = seededRandom(9);
+    for (let step = 0; roomStatus(data) === 'playing'; step++) {
+      expect(step).toBeLessThan(3000);
+      const c = { now: 1_000 + step, connected: new Set(all), random };
+      if (playBot(data, c)) continue;
+      // The person plays like a bot too, through the normal message path.
+      const game = data.game as NonNullable<typeof data.game>;
+      const move = chooseBotAction(viewFor(game, 's1'), emptyBotNotes(), random);
+      if (!move) throw new Error('la persona no tiene jugada');
+      const { playerId: _, ...action } = move.action as Record<string, unknown>;
+      expectOk(handleMessage(data, 's1', { type: 'action', action } as never, c));
+    }
+    expect(roomStatus(data)).toBe('ended');
+    expect(data.chat?.length).toBeGreaterThan(0);
+    expect(data.chat?.every((line) => data.seats.find((s) => s.id === line.playerId)?.bot)).toBe(
+      true,
+    );
+  });
+
+  it('los bots no pausan la partida ni heredan el anfitrión', () => {
+    const { data, all } = lobbyWithBots(1, 4);
+    expectOk(handleMessage(data, 's1', { type: 'set_ready', ready: true }, ctx(all)));
+    expectOk(handleMessage(data, 's1', { type: 'start' }, ctx(all)));
+    expect(data.pausedSince).toBeNull();
+    disconnectSeat(data, 's1', ctx([], 5_000));
+    expect(data.hostId).toBe('s1');
+    expect(data.pausedSince).toBe(5_000);
+    expect(pendingBot(data)).toBeNull();
   });
 });

@@ -49,6 +49,7 @@ export const clientMessageSchema = z.discriminatedUnion('type', [
     portrait: z.number().int().min(1).max(PORTRAIT_COUNT),
   }),
   z.strictObject({ type: z.literal('kick'), playerId }),
+  z.strictObject({ type: z.literal('add_bot') }),
   z.strictObject({ type: z.literal('start') }),
   z.strictObject({ type: z.literal('action'), action: gameActionSchema }),
   z.strictObject({ type: z.literal('leave') }),

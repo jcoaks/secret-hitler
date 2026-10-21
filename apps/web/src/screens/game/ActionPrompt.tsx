@@ -210,6 +210,7 @@ function PlayerChoice({
                 unavailableReason={reason}
                 selected={selected === player.id}
                 onSelect={() => setSelected(player.id)}
+                bot={room.players.find((p) => p.id === player.id)?.bot}
                 size="sm"
               />
             </li>

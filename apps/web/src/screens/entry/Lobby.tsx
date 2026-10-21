@@ -14,7 +14,8 @@ export function startHint(room: RoomView): string {
   const count = room.players.length;
   if (count < minPlayers) {
     const missing = minPlayers - count;
-    return `Faltan ${missing} ${missing === 1 ? 'jugador' : 'jugadores'}: se juega con ${minPlayers} a ${maxPlayers}.`;
+    const fill = room.you.isHost ? ' Invita a alguien o añade bots.' : '';
+    return `Faltan ${missing} ${missing === 1 ? 'jugador' : 'jugadores'}: se juega con ${minPlayers} a ${maxPlayers}.${fill}`;
   }
   const offline = room.players.filter((p) => !p.connected).length;
   if (offline > 0) return 'Esperando a que vuelvan los jugadores sin conexión.';
@@ -67,9 +68,16 @@ export function LobbyScreen() {
         </section>
 
         <section aria-label="Jugadores" className="w-full max-w-[980px] bg-bg-dark px-3 py-4">
-          <h2 className="m-0 mb-3 text-center text-2xl text-white">
-            JUGADORES ({room.players.length}/{rules.game.maxPlayers})
-          </h2>
+          <div className="mb-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <h2 className="m-0 text-center text-2xl text-white">
+              JUGADORES ({room.players.length}/{rules.game.maxPlayers})
+            </h2>
+            {room.you.isHost && room.players.length < rules.game.maxPlayers && (
+              <Button size="sm" variant="liberal" onClick={() => send({ type: 'add_bot' })}>
+                + AÑADIR BOT
+              </Button>
+            )}
+          </div>
           <ul className="m-0 flex list-none flex-wrap justify-center gap-3 p-0">
             {room.players.map((player) => (
               <li key={player.id} className="flex flex-col items-center gap-1.5">
@@ -78,21 +86,23 @@ export function LobbyScreen() {
                   portrait={player.portrait}
                   isYou={player.id === room.you.id}
                   offline={!player.connected}
+                  bot={player.bot}
                 />
                 <span
                   className={`font-sans text-[12px] font-bold ${player.ready ? 'text-liberal-hover' : 'text-text-2'}`}
                 >
-                  {player.id === room.hostId ? 'Anfitrión · ' : ''}
-                  {player.ready ? 'Listo' : 'Esperando'}
+                  {player.bot
+                    ? 'Bot'
+                    : `${player.id === room.hostId ? 'Anfitrión · ' : ''}${player.ready ? 'Listo' : 'Esperando'}`}
                 </span>
                 {room.you.isHost && player.id !== room.you.id && (
                   <button
                     type="button"
                     onClick={() => send({ type: 'kick', playerId: player.id })}
                     className="cursor-pointer border-0 bg-transparent font-sans text-[12px] font-bold text-orange-hover underline"
-                    aria-label={`Expulsar a ${player.name}`}
+                    aria-label={`${player.bot ? 'Quitar' : 'Expulsar'} a ${player.name}`}
                   >
-                    Expulsar
+                    {player.bot ? 'Quitar' : 'Expulsar'}
                   </button>
                 )}
               </li>
@@ -140,7 +150,7 @@ export function LobbyScreen() {
 
         <section className="flex flex-col items-center gap-3 text-center">
           <p aria-live="polite" className="m-0 text-[16px] font-bold text-text-2">
-            {room.setup.ok ? startHint(room) : room.setup.message}
+            {startHint(room)}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button

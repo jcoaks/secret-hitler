@@ -1,4 +1,5 @@
 import type { ChronicleEntry, PlayerId, PlayerView } from '@sh/engine';
+import type { ChatLine } from '@sh/protocol';
 import { Button } from '../../components/ui/Button';
 import { Dialog } from '../../components/ui/Dialog';
 import { POLICY_NAME, POWER_NAME } from '../../lib/text';
@@ -54,10 +55,13 @@ export function describeEntry(
 /** Every government, vote and policy so far, newest first. */
 export function HistoryDialog({
   game,
+  chat,
   open,
   onClose,
 }: {
   game: PlayerView;
+  /** Bot remarks, shown under the event they comment on. */
+  chat: ChatLine[];
   open: boolean;
   onClose: () => void;
 }) {
@@ -104,6 +108,14 @@ export function HistoryDialog({
                       .join(', ') || 'nadie'}
                   </span>
                 )}
+                {chat
+                  .filter((line) => line.chronicle - 1 === index)
+                  .map((line) => (
+                    <span key={line.id} className="mt-1 block text-[13px] text-text-2 italic">
+                      <strong className="not-italic text-white">{nameOf(line.playerId)}:</strong> «
+                      {line.text}»
+                    </span>
+                  ))}
               </li>
             );
           })}

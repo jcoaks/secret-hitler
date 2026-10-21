@@ -30,6 +30,10 @@ export interface PlayerCardProps {
   /** Not chooseable in the current prompt (e.g. term limited). */
   unavailable?: boolean;
   unavailableReason?: string;
+  /** A computer player: tagged on the portrait. */
+  bot?: boolean;
+  /** What the player is saying right now, shown in a speech bubble. */
+  speech?: string | null;
   /** `sm` in prompts: smaller and without the badge row. */
   size?: 'md' | 'sm';
   className?: string;
@@ -51,11 +55,14 @@ export function PlayerCard({
   unavailable = false,
   unavailableReason,
   size = 'md',
+  speech = null,
+  bot = false,
   className = '',
 }: PlayerCardProps) {
   const dim = dead || unavailable;
   const label = [
     isYou ? `${name} (tú)` : name,
+    bot && 'bot',
     badge && BADGE_TEXT[badge],
     role && ROLE_NAME[role],
     dead && 'ejecutado',
@@ -124,6 +131,11 @@ export function PlayerCard({
           {dead ? 'EJECUTADO' : unavailableReason?.toUpperCase()}
         </span>
       )}
+      {bot && (
+        <span className="absolute top-[3%] left-[3%] rounded bg-liberal-shadow px-1.5 py-0.5 font-sans text-[10px] font-bold tracking-wide text-white">
+          BOT
+        </span>
+      )}
       {offline && !dead && (
         <span className="absolute top-[3%] right-[3%] rounded bg-ink/85 px-1.5 py-0.5 font-sans text-[10px] font-bold text-white">
           sin conexión
@@ -142,8 +154,25 @@ export function PlayerCard({
 
   return (
     <div
-      className={`flex flex-col items-center gap-1 ${size === 'sm' ? 'w-[min(100px,max(64px,10vw),14dvh)]' : 'w-[clamp(72px,10.5vw,118px)]'} ${className}`}
+      className={`relative flex flex-col items-center gap-1 ${size === 'sm' ? 'w-[min(100px,max(64px,10vw),14dvh)]' : 'w-[clamp(72px,10.5vw,118px)]'} ${className}`}
     >
+      <AnimatePresence>
+        {speech && (
+          <motion.div
+            key={speech}
+            role="status"
+            aria-label={`${name} dice: ${speech}`}
+            initial={{ opacity: 0, y: 8, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+            className="pointer-events-none absolute bottom-[calc(100%-26px)] left-1/2 z-20 w-max max-w-[min(230px,60vw)] -translate-x-1/2 rounded-2xl bg-white px-3 py-2 text-center font-sans text-[13px] leading-snug font-bold text-ink shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+          >
+            {speech}
+            <span className="absolute top-full left-1/2 -translate-x-1/2 border-x-8 border-t-8 border-x-transparent border-t-white" />
+          </motion.div>
+        )}
+      </AnimatePresence>
       {size === 'md' && (
         <span
           className={`h-5 rounded px-1.5 font-sans text-[11px] leading-5 font-bold tracking-wide uppercase ${

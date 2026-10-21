@@ -72,7 +72,12 @@ export function GameScreen() {
       )}
       {over && !announcing && <GameOver room={room} game={game} />}
       <RoleDialog game={game} open={dialog === 'role'} onClose={closeDialog} />
-      <HistoryDialog game={game} open={dialog === 'history'} onClose={closeDialog} />
+      <HistoryDialog
+        game={game}
+        chat={room.chat}
+        open={dialog === 'history'}
+        onClose={closeDialog}
+      />
       <PauseOverlay />
     </div>
   );

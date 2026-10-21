@@ -1,5 +1,19 @@
-import { applyAction, createGame, type GameState, type Random, rules, viewFor } from '@sh/engine';
 import {
+  applyAction,
+  type BotNotes,
+  botRemark,
+  type ChronicleEntry,
+  chooseBotAction,
+  createGame,
+  emptyBotNotes,
+  type GameState,
+  type PlayerId,
+  type Random,
+  rules,
+  viewFor,
+} from '@sh/engine';
+import {
+  type ChatLine,
   type ClientMessage,
   cleanName,
   HOST_CAN_END_AFTER_MS,
@@ -21,6 +35,8 @@ export interface Seat {
   portrait: number;
   /** Left a game in progress. The seat is kept so the game can be ended cleanly. */
   left: boolean;
+  /** A computer player: always ready, always connected, moved by the room itself. */
+  bot?: boolean;
 }
 
 /** Everything the room persists. */
@@ -33,7 +49,32 @@ export interface RoomData {
   nextSeatNumber: number;
   game: GameState | null;
   pausedSince: number | null;
+  /** What each bot remembers during the current game. */
+  botNotes?: Record<string, BotNotes>;
+  /** When the next bot move is due (set by the Durable Object), and the events it has seen. */
+  botDueAt?: number | null;
+  botSeenEvents?: number;
+  /** Recent bot remarks, oldest first. */
+  chat?: ChatLine[];
+  nextChatId?: number;
 }
+
+/** Bot names: Spanish first names, never clashing with a player's. */
+const BOT_NAMES = [
+  'Lucía',
+  'Mateo',
+  'Sofía',
+  'Diego',
+  'Valentina',
+  'Andrés',
+  'Camila',
+  'Tomás',
+  'Elena',
+  'Joaquín',
+];
+const MAX_CHAT_LINES = 60;
+/** At most this many bots speak about the same event. */
+const REMARKS_PER_EVENT = 2;
 
 /** Per-event inputs that do not belong in the persisted data. */
 export interface RoomContext {
@@ -73,6 +114,15 @@ export function roomStatus(data: RoomData): RoomStatus {
 
 export function findSeatByTokenHash(data: RoomData, tokenHash: string): Seat | undefined {
   return data.seats.find((s) => s.tokenHash === tokenHash);
+}
+
+/** Bots are always at the table; people only while connected. */
+function isOnline(data: RoomData, ctx: RoomContext, seatId: string): boolean {
+  return ctx.connected.has(seatId) || data.seats.some((s) => s.id === seatId && s.bot);
+}
+
+function isReady(seat: Seat): boolean {
+  return seat.ready || Boolean(seat.bot);
 }
 
 function activeSeats(data: RoomData): Seat[] {
@@ -178,12 +228,18 @@ export function handleMessage(
       return { ok: true, kicked: message.playerId };
     }
 
+    case 'add_bot': {
+      if (!isHost) return error('not_host', 'Solo el anfitrión añade bots');
+      if (status !== 'lobby') return error('not_in_lobby', 'La partida ya comenzó');
+      return addBot(data, ctx);
+    }
+
     case 'start': {
       if (!isHost) return error('not_host', 'Solo el anfitrión empieza la partida');
       if (status !== 'lobby') return error('not_in_lobby', 'La partida ya comenzó');
       const setup = setupCheck(data);
       if (!setup.ok) return setup;
-      if (!data.seats.every((s) => s.ready && ctx.connected.has(s.id))) {
+      if (!data.seats.every((s) => isReady(s) && isOnline(data, ctx, s.id))) {
         return error('not_everyone_ready', 'Todos deben estar conectados y listos');
       }
       const created = createGame(
@@ -192,6 +248,8 @@ export function handleMessage(
       );
       if (!created.ok) return error(created.error.code, created.error.message);
       data.game = created.value;
+      data.botNotes = {};
+      data.chat = [];
       for (const s of data.seats) s.ready = false;
       updatePause(data, ctx);
       return okResult;
@@ -203,9 +261,11 @@ export function handleMessage(
       if (data.pausedSince !== null) {
         return error('game_paused', 'La partida está en pausa hasta que vuelvan todos');
       }
+      const before = data.game;
       const result = applyAction(data.game, { ...message.action, playerId: seatId }, ctx.random);
       if (!result.ok) return error(result.error.code, result.error.message);
       data.game = result.value;
+      botsReact(data, before, ctx);
       updatePause(data, ctx);
       return okResult;
     }
@@ -253,15 +313,19 @@ export function roomView(data: RoomData, seatId: string, ctx: RoomContext): Room
     players: data.seats.map((s) => ({
       id: s.id,
       name: s.name,
-      ready: s.ready,
-      connected: ctx.connected.has(s.id),
+      ready: isReady(s),
+      connected: isOnline(data, ctx, s.id),
       portrait: s.portrait,
       left: s.left,
+      bot: Boolean(s.bot),
     })),
     setup,
     canStart:
-      status === 'lobby' && setup.ok && data.seats.every((s) => s.ready && ctx.connected.has(s.id)),
+      status === 'lobby' &&
+      setup.ok &&
+      data.seats.every((s) => isReady(s) && isOnline(data, ctx, s.id)),
     game: data.game && inGame ? viewFor(data.game, seatId) : null,
+    chat: [...(data.chat ?? [])],
     pause:
       data.pausedSince === null
         ? null
@@ -315,7 +379,7 @@ function disconnectedPlayers(data: RoomData, ctx: RoomContext): string[] {
     data.game?.players.map((p) => p.id).filter((id) => !data.game?.deadIds.includes(id)) ?? [];
   return ids.filter((id) => {
     const seat = data.seats.find((s) => s.id === id);
-    return !seat || seat.left || !ctx.connected.has(id);
+    return !seat || seat.left || !isOnline(data, ctx, id);
   });
 }
 
@@ -336,7 +400,7 @@ function transferHost(data: RoomData, ctx: RoomContext): void {
   );
   for (let i = 1; i <= data.seats.length; i++) {
     const seat = data.seats[(from + i) % data.seats.length];
-    if (seat && seat.id !== data.hostId && !seat.left && ctx.connected.has(seat.id)) {
+    if (seat && seat.id !== data.hostId && !seat.left && !seat.bot && ctx.connected.has(seat.id)) {
       data.hostId = seat.id;
       return;
     }
@@ -346,12 +410,14 @@ function transferHost(data: RoomData, ctx: RoomContext): void {
 function removeSeat(data: RoomData, seatId: string, ctx: RoomContext): void {
   if (data.hostId === seatId) transferHost(data, ctx);
   data.seats = data.seats.filter((s) => s.id !== seatId);
-  if (data.hostId === seatId) data.hostId = data.seats[0]?.id ?? null;
+  if (data.hostId === seatId) data.hostId = data.seats.find((s) => !s.bot)?.id ?? null;
 }
 
 function backToLobby(data: RoomData, ctx: RoomContext): void {
   data.game = null;
   data.pausedSince = null;
+  data.botNotes = {};
+  data.chat = [];
   const leaving = data.seats.filter((s) => s.left).map((s) => s.id);
   for (const id of leaving) removeSeat(data, id, ctx);
   for (const s of data.seats) s.ready = false;
@@ -359,4 +425,113 @@ function backToLobby(data: RoomData, ctx: RoomContext): void {
 
 function touch(data: RoomData, ctx: RoomContext): void {
   data.lastActivity = ctx.now;
+}
+
+// ---------------------------------------------------------------------------
+// Bots
+
+function addBot(data: RoomData, ctx: RoomContext): RoomResult {
+  if (activeSeats(data).length >= rules.game.maxPlayers) {
+    return error('room_full', `La mesa ya tiene ${rules.game.maxPlayers} jugadores`);
+  }
+  const taken = (name: string) => data.seats.some((s) => sameName(s.name, name));
+  const name = BOT_NAMES.find((n) => !taken(n)) ?? `Bot ${data.nextSeatNumber}`;
+  const seat: Seat = {
+    id: `s${data.nextSeatNumber}`,
+    name,
+    tokenHash: '',
+    ready: true,
+    portrait: freePortrait(data, ctx),
+    left: false,
+    bot: true,
+  };
+  data.nextSeatNumber += 1;
+  data.seats.push(seat);
+  return { ok: true, seat };
+}
+
+/** The bot that has to move now, if any (the game is on and not paused). */
+export function pendingBot(data: RoomData): PlayerId | null {
+  const game = data.game;
+  if (!game || roomStatus(data) !== 'playing' || data.pausedSince !== null) return null;
+  for (const seat of data.seats) {
+    if (!seat.bot || !game.roles[seat.id]) continue;
+    const view = viewFor(game, seat.id);
+    // A throwaway random: this only asks whether the bot has a move.
+    if (chooseBotAction(view, notesOf(data, seat.id), () => 0.5)) return seat.id;
+  }
+  return null;
+}
+
+/** Plays one move for the bot whose turn it is. Returns false when no bot had to move. */
+export function playBot(data: RoomData, ctx: RoomContext): boolean {
+  const botId = pendingBot(data);
+  const game = data.game;
+  if (!botId || !game) return false;
+  const choice = chooseBotAction(viewFor(game, botId), notesOf(data, botId), ctx.random);
+  if (!choice) return false;
+  const result = applyAction(game, choice.action, ctx.random);
+  if (!result.ok) return false;
+  data.botNotes = { ...data.botNotes, [botId]: choice.notes };
+  data.game = result.value;
+  botsReact(data, game, ctx);
+  updatePause(data, ctx);
+  touch(data, ctx);
+  return true;
+}
+
+function notesOf(data: RoomData, botId: string): BotNotes {
+  return data.botNotes?.[botId] ?? emptyBotNotes();
+}
+
+/** Bots comment on what just happened: claims from those involved first, then a few onlookers. */
+function botsReact(data: RoomData, before: GameState, ctx: RoomContext): void {
+  const game = data.game;
+  if (!game) return;
+  const fresh = game.chronicle.slice(before.chronicle.length);
+  if (fresh.length === 0) return;
+  const bots = data.seats.filter((s) => s.bot && game.roles[s.id]);
+  if (bots.length === 0) return;
+
+  for (const entry of fresh) {
+    const government = governmentOf(game.chronicle, entry);
+    const remarks = bots
+      .map((seat) => ({
+        seat,
+        remark: botRemark(
+          viewFor(game, seat.id),
+          notesOf(data, seat.id),
+          entry,
+          government,
+          ctx.random,
+        ),
+      }))
+      .filter((r) => r.remark !== null)
+      .sort((a, b) => Number(b.remark?.involved) - Number(a.remark?.involved));
+    for (const { seat, remark } of remarks.slice(0, REMARKS_PER_EVENT)) {
+      // Placed right after the event it comments on, for the history.
+      if (remark) say(data, seat.id, remark.text, game.chronicle.indexOf(entry) + 1);
+    }
+  }
+}
+
+/** The elected government of the round an `enacted` entry belongs to. */
+function governmentOf(
+  chronicle: ChronicleEntry[],
+  entry: ChronicleEntry,
+): { presidentId: PlayerId; chancellorId: PlayerId } | null {
+  if (entry.type !== 'enacted' || entry.chaos) return null;
+  for (let i = chronicle.indexOf(entry) - 1; i >= 0; i--) {
+    const e = chronicle[i];
+    if (e?.type === 'election' && e.approved && e.round === entry.round) {
+      return { presidentId: e.presidentId, chancellorId: e.chancellorId };
+    }
+  }
+  return null;
+}
+
+function say(data: RoomData, playerId: string, text: string, chronicle: number): void {
+  const id = data.nextChatId ?? 1;
+  data.nextChatId = id + 1;
+  data.chat = [...(data.chat ?? []), { id, playerId, text, chronicle }].slice(-MAX_CHAT_LINES);
 }

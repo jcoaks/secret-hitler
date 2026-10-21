@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 // Needs the Worker and Vite running (`pnpm dev`); started automatically if not.
 export default defineConfig({
   testDir: '.',
-  timeout: 240_000,
+  timeout: 420_000,
   expect: { timeout: 15_000 },
   fullyParallel: true,
   reporter: [['list']],

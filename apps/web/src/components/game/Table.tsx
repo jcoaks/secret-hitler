@@ -1,13 +1,68 @@
 import type { PlayerId, PlayerView } from '@sh/engine';
-import type { RoomView } from '@sh/protocol';
+import type { ChatLine, RoomView } from '@sh/protocol';
+import { useEffect, useRef, useState } from 'react';
 import { badgeFor, knownRole, waitingOn } from '../../lib/game';
-import { useUiStore } from '../../store/ui';
+import { useAnnouncing, useUiStore } from '../../store/ui';
+
+const SPEECH_MS = 5500;
+const SPEECH_GAP_MS = 1100;
+
+/**
+ * Bot remarks as speech bubbles, one at a time, once the announcement of what they comment on
+ * has played. Lines already said when the screen opens are not replayed.
+ */
+function useSpeech(chat: ChatLine[], announcing: boolean): Map<string, string> {
+  const lastSeen = useRef<number | null>(null);
+  const queue = useRef<ChatLine[]>([]);
+  const [queued, setQueued] = useState(0);
+  const [showing, setShowing] = useState<Map<string, ChatLine>>(new Map());
+
+  useEffect(() => {
+    const lastId = chat.at(-1)?.id ?? 0;
+    if (lastSeen.current === null || lastId < lastSeen.current) {
+      lastSeen.current = lastId;
+      queue.current = [];
+      return;
+    }
+    const seen = lastSeen.current;
+    const fresh = chat.filter((line) => line.id > seen);
+    if (fresh.length === 0) return;
+    lastSeen.current = lastId;
+    queue.current.push(...fresh);
+    setQueued((n) => n + 1);
+  }, [chat]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `queued` re-runs the queue
+  useEffect(() => {
+    if (announcing || queue.current.length === 0) return;
+    const timer = window.setTimeout(() => {
+      const line = queue.current.shift();
+      if (!line) return;
+      setShowing((current) => new Map(current).set(line.playerId, line));
+      window.setTimeout(() => {
+        setShowing((current) => {
+          if (current.get(line.playerId)?.id !== line.id) return current;
+          const next = new Map(current);
+          next.delete(line.playerId);
+          return next;
+        });
+      }, SPEECH_MS);
+      setQueued((n) => n + 1);
+    }, SPEECH_GAP_MS);
+    return () => window.clearTimeout(timer);
+  }, [announcing, queued]);
+
+  return new Map([...showing].map(([id, line]) => [id, line.text]));
+}
+
 import { Boards, Deck } from './Board';
 import { PlayerCard } from './PlayerCard';
 
 /** Every seat in turn order, on the dark band of the original layout. */
 export function PlayerRow({ room, game }: { room: RoomView; game: PlayerView }) {
   const revealedVotes = useUiStore((s) => s.announcements[0]?.votes ?? null);
+  const announcing = useAnnouncing(game.chronicle.length);
+  const speech = useSpeech(room.chat, announcing);
   const busy = new Set(revealedVotes ? [] : waitingOn(game));
   const seat = (id: PlayerId) => room.players.find((p) => p.id === id);
 
@@ -26,6 +81,8 @@ export function PlayerRow({ room, game }: { room: RoomView; game: PlayerView }) 
               offline={!seat(player.id)?.connected}
               isYou={player.id === game.you.id}
               badge={badgeFor(game, player.id)}
+              speech={speech.get(player.id) ?? null}
+              bot={seat(player.id)?.bot}
             />
           </li>
         ))}
