@@ -99,11 +99,12 @@ export function Deck({ kind, count }: { kind: 'draw' | 'discard'; count: number 
             style={{ top: `${9 - i * 2}%` }}
           />
         ))}
-        {count > 0 && (
-          <span className="absolute top-[52%] left-[16%] w-[69%] text-center font-display text-[26cqw] leading-none text-white drop-shadow">
+        {/* Below the stack of card backs, in the pile's free bottom strip. */}
+        <span className="absolute inset-x-0 top-[78%] flex justify-center">
+          <span className="min-w-[30cqw] rounded-full bg-ink/85 px-[6cqw] py-[1.5cqw] text-center font-display text-[17cqw] leading-none text-white shadow">
             {count}
           </span>
-        )}
+        </span>
       </div>
       <span className="text-center font-sans text-[12px] font-bold text-text-2">{label}</span>
     </div>
