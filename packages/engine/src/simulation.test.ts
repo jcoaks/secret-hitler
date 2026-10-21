@@ -83,5 +83,6 @@ describe('random games', () => {
       'hitler_executed',
       'liberal_policies',
     ]);
-  });
+    // Thousands of full games: well under a second per hundred, but CI machines are slow.
+  }, 60_000);
 });
