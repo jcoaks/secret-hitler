@@ -19,13 +19,13 @@ export async function gameOver(page: Page): Promise<boolean> {
     .catch(() => false);
 }
 
-/** Creates a room from the home page and returns its code ("KX7QM2"). */
+/** Creates a room from the home page and returns its code ("KX7M"). */
 export async function createRoom(page: Page, name: string): Promise<string> {
   await page.goto('/');
   await page.getByLabel('Tu nombre').fill(name);
   await page.getByRole('button', { name: 'CREAR SALA' }).click();
   await page.getByText('CÓDIGO DE SALA').waitFor();
-  return ((await page.locator('h1 span').textContent()) ?? '').replace('-', '');
+  return (await page.locator('h1 span').textContent()) ?? '';
 }
 
 /** Answers the open prompt, if any. Returns a short name of what it did, or null. */

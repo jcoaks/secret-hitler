@@ -141,7 +141,7 @@ console.log(`✓ sala creada ${code}`);
 
 const info = await (await fetch(`${BASE}/api/rooms/${code.toLowerCase()}`)).json();
 if (info.playerCount !== 1 || !info.joinable) fail(`info inesperada ${JSON.stringify(info)}`);
-const missing = await fetch(`${BASE}/api/rooms/AAA-AAA`);
+const missing = await fetch(`${BASE}/api/rooms/AAAA`);
 if (missing.status !== 404) fail('una sala inexistente debería dar 404');
 console.log('✓ información de sala y 404');
 

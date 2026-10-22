@@ -1,4 +1,4 @@
-import { cleanName, formatRoomCode, normalizeRoomCode } from '@sh/protocol';
+import { cleanName, normalizeRoomCode } from '@sh/protocol';
 import { type FormEvent, useId, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Button } from '../../components/ui/Button';
@@ -31,7 +31,7 @@ export function HomeScreen() {
       const normalized = normalizeRoomCode(created.code);
       if (!normalized) throw new Error('Código inesperado');
       seatToken.set(normalized, created.seatToken);
-      navigate(`/sala/${formatRoomCode(normalized)}`);
+      navigate(`/sala/${normalized}`);
     } catch (error) {
       setNameError(
         error instanceof ApiRequestError ? error.message : 'Algo salió mal, inténtalo de nuevo.',
@@ -44,7 +44,7 @@ export function HomeScreen() {
     event.preventDefault();
     const normalized = normalizeRoomCode(code);
     if (!normalized) return setCodeError(problemCopy(codeFormatProblem(code)).message);
-    navigate(`/sala/${formatRoomCode(normalized)}`);
+    navigate(`/sala/${normalized}`);
   }
 
   return (
@@ -96,8 +96,8 @@ export function HomeScreen() {
               autoComplete="off"
               autoCapitalize="characters"
               spellCheck={false}
-              maxLength={9}
-              placeholder="KX7-QM2"
+              maxLength={6}
+              placeholder="KX7M"
               className="text-center tracking-[0.12em]"
               invalid={codeError !== null}
               aria-describedby={codeError ? ids.codeError : undefined}

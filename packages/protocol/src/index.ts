@@ -3,10 +3,10 @@ import type { z } from 'zod';
 import type { clientMessageSchema, createRoomSchema, gameActionSchema } from './schema';
 
 // ---------------------------------------------------------------------------
-// Room codes: "KX7-QM2". No 0/O or 1/I, so they can be read aloud.
+// Room codes: "KX7M". No 0/O or 1/I, so they can be read aloud.
 
 export const ROOM_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-export const ROOM_CODE_LENGTH = 6;
+export const ROOM_CODE_LENGTH = 4;
 
 /** Uppercases and strips separators; returns null if it cannot be a room code. */
 export function normalizeRoomCode(input: string): string | null {
@@ -14,10 +14,6 @@ export function normalizeRoomCode(input: string): string | null {
   if (raw.length !== ROOM_CODE_LENGTH) return null;
   for (const char of raw) if (!ROOM_CODE_ALPHABET.includes(char)) return null;
   return raw;
-}
-
-export function formatRoomCode(code: string): string {
-  return `${code.slice(0, 3)}-${code.slice(3)}`;
 }
 
 // ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { formatRoomCode, normalizeRoomCode } from '@sh/protocol';
+import { normalizeRoomCode } from '@sh/protocol';
 import { createRoomSchema } from '@sh/protocol/schema';
 import { randomRoomCode } from './crypto';
 
@@ -33,10 +33,7 @@ async function createRoom(request: Request, env: Env): Promise<Response> {
     const code = randomRoomCode();
     const result = await roomStub(env, code).create(code, parsed.data.name);
     if (result.ok) {
-      return json(
-        { code: formatRoomCode(code), playerId: result.playerId, seatToken: result.seatToken },
-        201,
-      );
+      return json({ code, playerId: result.playerId, seatToken: result.seatToken }, 201);
     }
     if (result.code !== 'room_exists') {
       return json({ error: result.code, message: result.message }, 400);
@@ -67,7 +64,7 @@ export default {
 
       if (request.method !== 'GET') return json({ error: 'method_not_allowed' }, 405);
       const info = await stub.info();
-      return info ? json({ ...info, code: formatRoomCode(info.code) }) : notFound();
+      return info ? json(info) : notFound();
     }
 
     if (url.pathname.startsWith('/api/')) return json({ error: 'not_found' }, 404);

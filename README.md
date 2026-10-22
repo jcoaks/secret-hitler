@@ -17,7 +17,7 @@ creas una sala, compartes el enlace y empieza la legislatura.
 
 ## Cómo se juega
 
-1. **Crea una sala** con tu nombre y comparte el enlace (o el código de 6 caracteres).
+1. **Crea una sala** con tu nombre y comparte el enlace (o el código de 4 caracteres).
 2. **Elige tu retrato** y marca que estás listo. Con 5 a 10 jugadores, el anfitrión empieza. Si faltan personas, el anfitrión puede **añadir bots**.
 3. **Abre tu sobre.** Eres liberal, fascista o Hitler; los fascistas se conocen entre sí.
 4. **Forma gobierno:** el presidente nomina canciller y todos votan ¡Ja! o Nein.

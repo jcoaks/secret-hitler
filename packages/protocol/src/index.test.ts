@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { cleanName, formatRoomCode, MAX_MESSAGE_BYTES, normalizeRoomCode } from './index';
+import { cleanName, MAX_MESSAGE_BYTES, normalizeRoomCode } from './index';
 import { parseClientMessage } from './schema';
 
 const parse = (value: unknown) => parseClientMessage(JSON.stringify(value));
 
 describe('códigos de sala', () => {
   it('normaliza mayúsculas, guiones y espacios', () => {
-    expect(normalizeRoomCode('kx7-qm2')).toBe('KX7QM2');
-    expect(normalizeRoomCode(' KX7 QM2 ')).toBe('KX7QM2');
-    expect(formatRoomCode('KX7QM2')).toBe('KX7-QM2');
+    expect(normalizeRoomCode('kx7m')).toBe('KX7M');
+    expect(normalizeRoomCode(' KX-7M ')).toBe('KX7M');
   });
 
   it('rechaza longitudes erróneas y caracteres ambiguos', () => {
-    expect(normalizeRoomCode('KX7-Q')).toBeNull();
-    expect(normalizeRoomCode('KX0-QM2')).toBeNull();
-    expect(normalizeRoomCode('KX1-QMI')).toBeNull();
+    expect(normalizeRoomCode('KX7')).toBeNull();
+    expect(normalizeRoomCode('KX7QM2')).toBeNull();
+    expect(normalizeRoomCode('KX0M')).toBeNull();
+    expect(normalizeRoomCode('KX1I')).toBeNull();
   });
 });
 

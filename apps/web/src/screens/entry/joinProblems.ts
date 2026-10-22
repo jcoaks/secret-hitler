@@ -27,13 +27,13 @@ export function problemCopy(problem: JoinProblem): ProblemCopy {
     case 'incomplete':
       return {
         title: 'El código está incompleto',
-        message: `Los códigos tienen ${ROOM_CODE_LENGTH} caracteres, como KX7-QM2. Revisa el mensaje del anfitrión.`,
+        message: `Los códigos tienen ${ROOM_CODE_LENGTH} caracteres, como KX7M. Revisa el mensaje del anfitrión.`,
       };
     case 'invalid':
       return {
         title: 'Ese código no es válido',
         message:
-          'Los códigos usan letras y números, sin 0, O, 1 ni I, como KX7-QM2. Revisa el mensaje del anfitrión.',
+          'Los códigos usan letras y números, sin 0, O, 1 ni I, como KX7M. Revisa el mensaje del anfitrión.',
       };
     case 'not_found':
       return {

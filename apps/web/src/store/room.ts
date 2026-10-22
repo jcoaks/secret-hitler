@@ -24,7 +24,7 @@ export interface RoomNotice {
 }
 
 interface RoomStore {
-  /** Normalized room code ("KX7QM2") of the current connection. */
+  /** Normalized room code ("KX7M") of the current connection. */
   code: string | null;
   playerId: string | null;
   status: ConnectionStatus;

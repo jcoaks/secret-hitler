@@ -1,5 +1,5 @@
 import { rules } from '@sh/engine';
-import { formatRoomCode, PORTRAIT_COUNT, type RoomView } from '@sh/protocol';
+import { PORTRAIT_COUNT, type RoomView } from '@sh/protocol';
 import { useState } from 'react';
 import { PlayerCard } from '../../components/game/PlayerCard';
 import { Button } from '../../components/ui/Button';
@@ -37,7 +37,7 @@ export function LobbyScreen() {
   const takenBy = new Map(room.players.map((p) => [p.portrait, p.id]));
   const [copied, setCopied] = useState(false);
 
-  const link = `${window.location.origin}/sala/${formatRoomCode(room.code)}`;
+  const link = `${window.location.origin}/sala/${room.code}`;
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(link);
@@ -54,8 +54,7 @@ export function LobbyScreen() {
       <main className="flex flex-1 flex-col items-center gap-6 px-4 py-6">
         <section className="flex flex-col items-center gap-2 text-center">
           <h1 className="m-0 text-[clamp(28px,5vw,40px)] text-white">
-            CÓDIGO DE SALA:{' '}
-            <span className="tracking-[0.08em] text-orange-hover">{formatRoomCode(room.code)}</span>
+            CÓDIGO DE SALA: <span className="tracking-[0.08em] text-orange-hover">{room.code}</span>
           </h1>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Button size="sm" variant="liberal" onClick={copyLink}>

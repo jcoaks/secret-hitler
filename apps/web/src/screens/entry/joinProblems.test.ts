@@ -11,7 +11,7 @@ import {
 } from './joinProblems';
 
 const info = (over: Partial<Parameters<typeof roomInfoProblem>[0]> = {}) => ({
-  code: 'KX7-QM2',
+  code: 'KX7M',
   status: 'lobby' as const,
   playerCount: 4,
   joinable: true,
@@ -22,9 +22,9 @@ const info = (over: Partial<Parameters<typeof roomInfoProblem>[0]> = {}) => ({
 
 describe('join problems', () => {
   it('tells incomplete codes from codes with bad characters', () => {
-    expect(codeFormatProblem('KX7-Q')).toEqual({ kind: 'incomplete' });
+    expect(codeFormatProblem('KX7')).toEqual({ kind: 'incomplete' });
     expect(codeFormatProblem('')).toEqual({ kind: 'incomplete' });
-    expect(codeFormatProblem('KX0-QM1')).toEqual({ kind: 'invalid' });
+    expect(codeFormatProblem('KX0M')).toEqual({ kind: 'invalid' });
   });
 
   it('maps room info to full / started', () => {

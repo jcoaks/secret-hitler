@@ -24,7 +24,7 @@ function ctx(connected: Iterable<string>, now = 1_000): RoomContext {
 
 /** A lobby with `n` connected seats s1..sn; s1 is the host. */
 function lobby(n: number): { data: RoomData; all: string[] } {
-  const data = createRoom('KX7QM2', 0);
+  const data = createRoom('KX7M', 0);
   const all: string[] = [];
   for (let i = 0; i < n; i++) {
     const result = addSeat(data, NAMES[i] as string, `hash${i}`, ctx(all));

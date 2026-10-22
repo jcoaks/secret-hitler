@@ -1,4 +1,4 @@
-import { cleanName, formatRoomCode, normalizeRoomCode } from '@sh/protocol';
+import { cleanName, normalizeRoomCode } from '@sh/protocol';
 import { type FormEvent, useId, useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { lastName, seatToken } from '../../lib/session';
@@ -91,10 +91,7 @@ export function JoinLinkScreen({ code: rawCode }: { code: string }) {
           {info?.hostName ? `${info.hostName} te invita a jugar` : 'Te invitan a jugar'}
         </h1>
         <p className="m-0 text-[15px] text-text-2">
-          Sala{' '}
-          <strong className="tracking-[0.1em] text-white">
-            {code ? formatRoomCode(code) : rawCode}
-          </strong>
+          Sala <strong className="tracking-[0.1em] text-white">{code ?? rawCode}</strong>
           {info && ` · ${info.playerCount} ${info.playerCount === 1 ? 'jugador' : 'jugadores'}`}
           {info && info.playerNames.length > 0 && `: ${info.playerNames.join(', ')}`}
         </p>
