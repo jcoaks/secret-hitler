@@ -1,7 +1,7 @@
 import { type Party, type PlayerView, partyOf } from '@sh/engine';
-import type { RoomView } from '@sh/protocol';
+import type { ChatLine, RoomView } from '@sh/protocol';
 import { motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PlayerCard } from '../../components/game/PlayerCard';
 import { Button } from '../../components/ui/Button';
 import { useActions } from '../../hooks';
@@ -11,9 +11,38 @@ import { useUiStore } from '../../store/ui';
 
 const BANNER_EDGE: Record<Party, string> = { liberal: '#62adbf', fascist: '#e46449' };
 
+const FAREWELL_MS = 3800;
+
+/** The bots' last words, one bubble at a time, round and round while the screen is open. */
+function useFarewell(chat: ChatLine[]): ChatLine | null {
+  const farewells = chat.filter((line) => line.final);
+  const [index, setIndex] = useState(-1);
+  const count = farewells.length;
+  useEffect(() => {
+    if (count === 0) return;
+    const first = window.setTimeout(() => setIndex(0), 900);
+    const timer = window.setInterval(() => setIndex((i) => (i + 1) % count), FAREWELL_MS);
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(timer);
+    };
+  }, [count]);
+  return index >= 0 ? (farewells[index % count] ?? null) : null;
+}
+
 const TEAM_TITLE: Record<Party, string> = { liberal: 'LIBERALES', fascist: 'FASCISTAS' };
 
-function Team({ party, room, game }: { party: Party; room: RoomView; game: PlayerView }) {
+function Team({
+  party,
+  room,
+  game,
+  speaking,
+}: {
+  party: Party;
+  room: RoomView;
+  game: PlayerView;
+  speaking: ChatLine | null;
+}) {
   const members = game.players.filter((p) => {
     const role = game.roles?.[p.id];
     return role !== undefined && partyOf(role) === party;
@@ -26,7 +55,7 @@ function Team({ party, room, game }: { party: Party; room: RoomView; game: Playe
         {TEAM_TITLE[party]}
       </h3>
       <ul className="m-0 flex list-none flex-wrap justify-center gap-2 p-0">
-        {members.map((player) => (
+        {members.map((player, i) => (
           <li key={player.id}>
             <PlayerCard
               name={player.name}
@@ -35,6 +64,16 @@ function Team({ party, room, game }: { party: Party; room: RoomView; game: Playe
               dead={game.deadIds.includes(player.id)}
               isYou={player.id === game.you.id}
               bot={room.players.find((p) => p.id === player.id)?.bot}
+              speech={speaking?.playerId === player.id ? speaking.text : null}
+              speechAlign={
+                members.length === 1
+                  ? 'center'
+                  : i === 0
+                    ? 'start'
+                    : i === members.length - 1
+                      ? 'end'
+                      : 'center'
+              }
               size="sm"
             />
           </li>
@@ -52,6 +91,7 @@ export function GameOver({ room, game }: { room: RoomView; game: PlayerView }) {
   const winner = game.winner ?? 'liberal';
   const won = game.you.party === winner;
   const loser: Party = winner === 'liberal' ? 'fascist' : 'liberal';
+  const speaking = useFarewell(room.chat);
 
   if (minimized) {
     return (
@@ -98,8 +138,8 @@ export function GameOver({ room, game }: { room: RoomView; game: PlayerView }) {
             </span>
           </div>
           <div className="flex w-full flex-wrap items-start justify-center gap-x-10 gap-y-4">
-            <Team party={winner} room={room} game={game} />
-            <Team party={loser} room={room} game={game} />
+            <Team party={winner} room={room} game={game} speaking={speaking} />
+            <Team party={loser} room={room} game={game} speaking={speaking} />
           </div>
         </div>
         <footer className="flex flex-none flex-col-reverse items-center gap-3 border-t border-white/10 px-4 py-4 sm:flex-row sm:justify-between sm:px-6">

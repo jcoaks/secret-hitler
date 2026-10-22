@@ -1,6 +1,7 @@
 import {
   applyAction,
   type BotNotes,
+  botFarewell,
   botRemark,
   type ChronicleEntry,
   chooseBotAction,
@@ -73,8 +74,9 @@ const BOT_NAMES = [
   'Joaquín',
 ];
 const MAX_CHAT_LINES = 60;
-/** At most this many bots speak about the same event. */
+/** At most this many bots speak about the same event, and this many say goodbye. */
 const REMARKS_PER_EVENT = 2;
+const FAREWELLS = 3;
 
 /** Per-event inputs that do not belong in the persisted data. */
 export interface RoomContext {
@@ -513,6 +515,35 @@ function botsReact(data: RoomData, before: GameState, ctx: RoomContext): void {
       if (remark) say(data, seat.id, remark.text, game.chronicle.indexOf(entry) + 1);
     }
   }
+
+  if (game.phase === 'game_over' && before.phase !== 'game_over')
+    sayFarewells(data, game, bots, ctx);
+}
+
+/** A few bots have the last word: whoever decided the ending first, then anyone. */
+function sayFarewells(data: RoomData, game: GameState, bots: Seat[], ctx: RoomContext): void {
+  const ending = game.chronicle.at(-1);
+  const central = (id: string) =>
+    game.roles[id] === 'hitler' ||
+    (ending?.type === 'execution' && (ending.presidentId === id || ending.targetId === id))
+      ? 0
+      : 1;
+  const ordered = [...bots]
+    .map((seat) => ({ seat, order: central(seat.id) + ctx.random() }))
+    .sort((a, b) => a.order - b.order);
+  const said = new Set<string>();
+  for (const { seat } of ordered) {
+    if (said.size >= FAREWELLS) break;
+    // A few tries for a line nobody said yet: three identical goodbyes are not funny.
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const text = botFarewell(viewFor(game, seat.id), notesOf(data, seat.id), ctx.random);
+      if (!text) break;
+      if (said.has(text)) continue;
+      say(data, seat.id, text, game.chronicle.length, true);
+      said.add(text);
+      break;
+    }
+  }
 }
 
 /** The elected government of the round an `enacted` entry belongs to. */
@@ -530,8 +561,15 @@ function governmentOf(
   return null;
 }
 
-function say(data: RoomData, playerId: string, text: string, chronicle: number): void {
+function say(
+  data: RoomData,
+  playerId: string,
+  text: string,
+  chronicle: number,
+  final = false,
+): void {
   const id = data.nextChatId ?? 1;
   data.nextChatId = id + 1;
-  data.chat = [...(data.chat ?? []), { id, playerId, text, chronicle }].slice(-MAX_CHAT_LINES);
+  const line = final ? { id, playerId, text, chronicle, final } : { id, playerId, text, chronicle };
+  data.chat = [...(data.chat ?? []), line].slice(-MAX_CHAT_LINES);
 }

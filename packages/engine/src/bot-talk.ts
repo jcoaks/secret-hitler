@@ -53,7 +53,7 @@ export function botRemark(
         return random() < 0.3
           ? {
               text: pick(
-                ['El caos nunca ayuda a nadie…', 'Teníamos que ponernos de acuerdo.'],
+                ['Puro caos, así no se puede…', 'Teníamos que ponernos de acuerdo, gente.'],
                 random,
               ),
               involved: false,
@@ -86,7 +86,7 @@ export function botRemark(
             ? pick(
                 [
                   `Me llegaron dos fascistas. No tuve opción.`,
-                  `${nameOf(presidentId)} me pasó dos fascistas, lo juro.`,
+                  `${nameOf(presidentId)} me pasó dos fascistas, se los juro.`,
                 ],
                 random,
               )
@@ -102,9 +102,9 @@ export function botRemark(
         return {
           text: pick(
             [
-              `No me fío de ${nameOf(suspect)}.`,
-              `¿Otra fascista? ${nameOf(suspect)} tiene algo que explicar.`,
-              `Yo vigilaría a ${nameOf(suspect)}.`,
+              `${nameOf(suspect)} me da mala espina.`,
+              `¿Otra fascista? ${nameOf(suspect)} tiene mucho que explicar.`,
+              `Yo que ustedes, le echaba un ojo a ${nameOf(suspect)}.`,
             ],
             random,
           ),
@@ -113,7 +113,7 @@ export function botRemark(
       }
       if (!fascist && random() < 0.15) {
         return {
-          text: pick(['Bien, así sí.', 'Eso es lo que necesitamos.'], random),
+          text: pick(['¡Eso! Así sí.', 'Eso es justo lo que necesitábamos.'], random),
           involved: false,
         };
       }
@@ -129,7 +129,7 @@ export function botRemark(
       return {
         text: pick(
           [
-            `No me convence ${nameOf(doubtful)}.`,
+            `${nameOf(doubtful)} no me convence para nada.`,
             `Voté Nein: ${nameOf(doubtful)} no me da confianza.`,
           ],
           random,
@@ -159,13 +159,16 @@ export function botRemark(
 
     case 'special_election':
       return entry.presidentId === me
-        ? { text: `Confío en ${nameOf(entry.targetId)}. Que presida.`, involved: true }
+        ? { text: `Le tengo confianza a ${nameOf(entry.targetId)}. Que presida.`, involved: true }
         : null;
 
     case 'execution':
       if (entry.presidentId === me && view.phase !== 'game_over') {
         return {
-          text: pick([`Lo siento, ${nameOf(entry.targetId)}.`, 'Era necesario.'], random),
+          text: pick(
+            [`Lo siento, ${nameOf(entry.targetId)}.`, 'Era necesario, no me lo tomen a mal.'],
+            random,
+          ),
           involved: true,
         };
       }
@@ -173,10 +176,105 @@ export function botRemark(
 
     case 'veto':
       return entry.chancellorId === me
-        ? { text: 'Nada bueno en esa mano. Mejor vetarla.', involved: true }
+        ? { text: 'Esa mano no servía para nada. Mejor vetarla.', involved: true }
         : null;
 
     default:
       return null;
   }
+}
+
+/**
+ * A last word once the game is over, when everyone's role is on the table. Null if this bot has
+ * nothing to add; the room picks a few.
+ */
+export function botFarewell(view: PlayerView, notes: BotNotes, random: Random): string | null {
+  const roles = view.roles;
+  if (view.phase !== 'game_over' || !roles || !view.winner || !view.winReason) return null;
+  const me = view.you.id;
+  const role = view.you.role;
+  const won = view.you.party === view.winner;
+  const nameOf = (id: PlayerId) => view.players.find((p) => p.id === id)?.name ?? '¿?';
+  const lastExecution = [...view.chronicle].reverse().find((e) => e.type === 'execution');
+
+  if (view.winReason === 'hitler_executed' && lastExecution?.type === 'execution') {
+    if (lastExecution.targetId === me) {
+      return pick(
+        ['Bueno… nadie es perfecto.', '¿En serio? ¿Justo a mí?', 'Estuve tan cerca…'],
+        random,
+      );
+    }
+    if (lastExecution.presidentId === me) {
+      return pick(
+        [
+          `¡Sabía que eras tú, ${nameOf(lastExecution.targetId)}!`,
+          'Tenía una corazonada, nada más.',
+        ],
+        random,
+      );
+    }
+  }
+  if (view.winReason === 'hitler_elected' && role === 'hitler') {
+    return pick(
+      [
+        '¿Sorprendidos? Yo tampoco.',
+        'Les dije que yo era de confianza.',
+        'Gracias por los votos, muchachos.',
+      ],
+      random,
+    );
+  }
+  if (!view.you.alive && role === 'liberal') {
+    return pick(
+      ['Desde el más allá: se los dije.', 'Igual los apoyé desde el cementerio.'],
+      random,
+    );
+  }
+
+  if (role === 'liberal') {
+    // Who did I suspect most, and was I right?
+    const beliefs = beliefsFor(view, notes);
+    const suspect = view.players
+      .map((p) => p.id)
+      .filter((id) => id !== me)
+      .sort((a, b) => (beliefs.reputation.get(a) ?? 0) - (beliefs.reputation.get(b) ?? 0))[0];
+    const caught = suspect && roles[suspect] !== 'liberal';
+    if (suspect && (beliefs.reputation.get(suspect) ?? 0) <= -2) {
+      return caught
+        ? pick(
+            [
+              `¡Se los dije! ${nameOf(suspect)} era de los malos.`,
+              `Yo sabía que ${nameOf(suspect)} andaba en algo raro.`,
+            ],
+            random,
+          )
+        : pick(
+            [
+              `Perdón, ${nameOf(suspect)}, te juzgué mal.`,
+              `Juraría que ${nameOf(suspect)} era fascista…`,
+            ],
+            random,
+          );
+    }
+    return won
+      ? pick(
+          ['¡Ganó la democracia!', 'Nunca dudé de ustedes… bueno, un poquito.', '¡Eso, equipo!'],
+          random,
+        )
+      : pick(
+          [
+            'Sabía que algo andaba mal…',
+            'La próxima vez no le creo a nadie.',
+            'Me engañaron como a un niño.',
+          ],
+          random,
+        );
+  }
+
+  return won
+    ? pick(
+        ['Fue un placer engañarlos.', '¡Ni cuenta se dieron!', 'Todo salió según el plan.'],
+        random,
+      )
+    : pick(['Casi lo logramos.', 'La próxima no me descubren.', 'Bien jugado… esta vez.'], random);
 }

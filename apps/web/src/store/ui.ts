@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { Announcement } from '../lib/announcements';
 
-export type Dialog = 'leave' | 'history' | 'role' | null;
+export type Dialog = 'leave' | 'history' | 'role' | 'rules' | null;
 
 interface UiStore {
   dialog: Dialog;

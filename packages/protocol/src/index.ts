@@ -89,6 +89,8 @@ export interface ChatLine {
   text: string;
   /** Chronicle length right after the event it comments on, to place it in the history. */
   chronicle: number;
+  /** A farewell once the game is over, shown on the end screen. */
+  final?: boolean;
 }
 
 export interface RoomView {

@@ -11,6 +11,17 @@ const BADGE_TEXT: Record<Badge, string> = {
   nominee: 'Candidato',
 };
 
+const BUBBLE_ALIGN = {
+  center: 'left-1/2 -translate-x-1/2',
+  start: 'left-[-4px]',
+  end: 'right-[-4px]',
+} as const;
+const TAIL_ALIGN = {
+  center: 'left-1/2 -translate-x-1/2',
+  start: 'left-[34px]',
+  end: 'right-[34px]',
+} as const;
+
 export interface PlayerCardProps {
   name: string;
   portrait: number;
@@ -34,6 +45,8 @@ export interface PlayerCardProps {
   bot?: boolean;
   /** What the player is saying right now, shown in a speech bubble. */
   speech?: string | null;
+  /** Which way the bubble grows: towards the inside on the cards at the edge of a row. */
+  speechAlign?: 'center' | 'start' | 'end';
   /** `sm` in prompts: smaller and without the badge row. */
   size?: 'md' | 'sm';
   className?: string;
@@ -56,6 +69,7 @@ export function PlayerCard({
   unavailableReason,
   size = 'md',
   speech = null,
+  speechAlign = 'center',
   bot = false,
   className = '',
 }: PlayerCardProps) {
@@ -166,10 +180,12 @@ export function PlayerCard({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-            className="pointer-events-none absolute bottom-[calc(100%-26px)] left-1/2 z-20 w-max max-w-[min(230px,60vw)] -translate-x-1/2 rounded-2xl bg-white px-3 py-2 text-center font-sans text-[13px] leading-snug font-bold text-ink shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+            className={`pointer-events-none absolute bottom-[calc(100%-26px)] z-20 w-max max-w-[min(230px,60vw)] ${BUBBLE_ALIGN[speechAlign]} rounded-2xl bg-white px-3 py-2 text-center font-sans text-[13px] leading-snug font-bold text-ink shadow-[0_8px_24px_rgba(0,0,0,0.45)]`}
           >
             {speech}
-            <span className="absolute top-full left-1/2 -translate-x-1/2 border-x-8 border-t-8 border-x-transparent border-t-white" />
+            <span
+              className={`absolute top-full ${TAIL_ALIGN[speechAlign]} border-x-8 border-t-8 border-x-transparent border-t-white`}
+            />
           </motion.div>
         )}
       </AnimatePresence>

@@ -287,6 +287,10 @@ describe('bots', () => {
     }
     expect(roomStatus(data)).toBe('ended');
     expect(data.chat?.length).toBeGreaterThan(0);
+    // Some bots say goodbye at the end.
+    const farewells = data.chat?.filter((line) => line.final) ?? [];
+    expect(farewells.length).toBeGreaterThan(0);
+    expect(farewells.length).toBeLessThanOrEqual(3);
     expect(data.chat?.every((line) => data.seats.find((s) => s.id === line.playerId)?.bot)).toBe(
       true,
     );

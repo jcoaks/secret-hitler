@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { BoardArea, PlayerRow, StatusBar } from '../components/game/Table';
+import { Button } from '../components/ui/Button';
+import { Dialog } from '../components/ui/Dialog';
 import { Header, HeaderButton } from '../components/ui/Header';
 import { useRoom } from '../hooks';
 import { statusText } from '../lib/game';
 import { introSeen } from '../lib/session';
 import { useAnnouncing, useUiStore } from '../store/ui';
+import { RulesContent } from './entry/Rules';
 import { ActionPrompt } from './game/ActionPrompt';
 import { Announcements } from './game/Announcements';
 import { GameOver } from './game/GameOver';
@@ -39,7 +42,15 @@ export function GameScreen() {
   return (
     <div className="flex min-h-dvh flex-col">
       <Header
-        left={<HeaderButton onClick={() => openDialog('role')}>Tu rol</HeaderButton>}
+        left={
+          <>
+            <HeaderButton onClick={() => openDialog('role')}>Tu rol</HeaderButton>
+            <HeaderButton onClick={() => openDialog('rules')} label="Reglas del juego">
+              <span className="sm:hidden">?</span>
+              <span className="hidden sm:inline">Reglas</span>
+            </HeaderButton>
+          </>
+        }
         right={
           <>
             <HeaderButton onClick={() => openDialog('history')}>Historial</HeaderButton>
@@ -78,6 +89,15 @@ export function GameScreen() {
         open={dialog === 'history'}
         onClose={closeDialog}
       />
+      <Dialog
+        open={dialog === 'rules'}
+        onClose={closeDialog}
+        title="CÓMO SE JUEGA"
+        width={760}
+        actions={<Button onClick={closeDialog}>VOLVER A LA PARTIDA</Button>}
+      >
+        <RulesContent />
+      </Dialog>
       <PauseOverlay />
     </div>
   );
