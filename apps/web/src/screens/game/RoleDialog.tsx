@@ -1,5 +1,5 @@
 import type { PlayerView } from '@sh/engine';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Dialog } from '../../components/ui/Dialog';
@@ -74,44 +74,68 @@ function RoleSheet({ game }: { game: PlayerView }) {
   );
 }
 
-/** The sealed envelope; once opened, the card rises out of it. */
-function Envelope({ game, opening }: { game: PlayerView; opening: boolean }) {
+const SLIDE_S = 0.7;
+const FADE_S = 0.25;
+
+/**
+ * The sealed envelope; once opened, the card slides out to its right while the envelope steps
+ * left, so the pair stays centered. Then the card grows into the sheet (shared `layoutId`).
+ */
+function Envelope({
+  game,
+  opening,
+  emptied,
+}: {
+  game: PlayerView;
+  opening: boolean;
+  /** The card is out: the envelope fades away and leaves it alone. */
+  emptied: boolean;
+}) {
+  const paper = {
+    animate: { opacity: emptied ? 0 : 1 },
+    transition: { duration: FADE_S },
+  };
   return (
-    // The top padding leaves room inside the dialog for the card to rise into.
-    <div className="w-[clamp(120px,30vw,160px)] pt-[52%]">
+    <motion.div
+      animate={{ x: opening ? '-40%' : 0 }}
+      transition={{ duration: SLIDE_S, ease: 'easeInOut' }}
+      className="w-[clamp(120px,30vw,160px)]"
+    >
       <div className="relative w-full" style={{ aspectRatio: '723 / 962' }}>
-        <img src={art.envelopeBack} alt="" className="absolute inset-0 w-full" />
+        <motion.img {...paper} src={art.envelopeBack} alt="" className="absolute inset-0 w-full" />
         {opening && (
           <motion.img
             layoutId="role-card"
             src={roleCardUrl(game.you.role, game.you.id)}
             alt=""
-            initial={{ y: '10%' }}
-            animate={{ y: '-52%' }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="absolute top-0 left-[6%] w-[70%] rounded-[5%]"
+            initial={{ x: 0, y: '8%' }}
+            animate={{ x: '125%', y: '4%' }}
+            transition={{ duration: SLIDE_S, ease: 'easeInOut' }}
+            className="absolute top-0 left-[6%] w-[70%] rounded-[5%] shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
           />
         )}
-        <img
+        <motion.img
+          {...paper}
           src={art.envelopeFront}
           alt=""
           className="pointer-events-none absolute inset-0 w-full"
         />
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 /** Shown once at the start of the game: open the envelope to see your role. */
 export function RoleIntro({ game, onDone }: { game: PlayerView; onDone: () => void }) {
-  const [stage, setStage] = useState<'sealed' | 'opening' | 'open'>('sealed');
+  const [stage, setStage] = useState<'sealed' | 'opening' | 'out' | 'open'>('sealed');
 
   return (
     <Dialog
       open
       alert
       title="TU ROL SECRETO"
-      width={stage === 'open' ? 720 : 520}
+      // One width throughout: resizing mid-animation made the envelope and card jump.
+      width={720}
       actions={
         stage === 'open' ? (
           <Button size="lg" onClick={onDone}>
@@ -120,10 +144,11 @@ export function RoleIntro({ game, onDone }: { game: PlayerView; onDone: () => vo
         ) : (
           <Button
             size="lg"
-            disabled={stage === 'opening'}
+            disabled={stage !== 'sealed'}
             onClick={() => {
               setStage('opening');
-              window.setTimeout(() => setStage('open'), 750);
+              window.setTimeout(() => setStage('out'), SLIDE_S * 1000 + 100);
+              window.setTimeout(() => setStage('open'), (SLIDE_S + FADE_S) * 1000 + 150);
             }}
           >
             ABRIR SOBRE
@@ -131,19 +156,18 @@ export function RoleIntro({ game, onDone }: { game: PlayerView; onDone: () => vo
         )
       }
     >
-      <AnimatePresence mode="popLayout">
-        {stage === 'open' ? (
-          <motion.div key="sheet" className="w-full">
-            <RoleSheet game={game} />
-          </motion.div>
-        ) : (
-          <motion.div key="envelope" exit={{ opacity: 0 }} className="flex flex-col items-center">
-            <Envelope game={game} opening={stage === 'opening'} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* The card hands over between the two by its shared layoutId: it grows into the sheet. */}
+      {stage === 'open' ? (
+        <RoleSheet game={game} />
+      ) : (
+        <Envelope game={game} opening={stage !== 'sealed'} emptied={stage === 'out'} />
+      )}
       {stage !== 'open' && (
-        <p className="m-0 text-[15px] text-text-2">Asegúrate de que nadie más vea tu pantalla.</p>
+        <p
+          className={`m-0 text-[15px] text-text-2 transition-opacity ${stage === 'sealed' ? '' : 'opacity-0'}`}
+        >
+          Asegúrate de que nadie más vea tu pantalla.
+        </p>
       )}
     </Dialog>
   );
