@@ -1,6 +1,7 @@
-import type { PlayerId, PlayerView } from '@sh/engine';
+import { countRules, type PlayerId, type PlayerView, type Role } from '@sh/engine';
 import type { ChatLine, RoomView } from '@sh/protocol';
 import { useEffect, useRef, useState } from 'react';
+import { art } from '../../lib/assets';
 import { badgeFor, knownRole, waitingOn } from '../../lib/game';
 import { useAnnouncing, useUiStore } from '../../store/ui';
 
@@ -87,7 +88,27 @@ export function PlayerRow({ room, game }: { room: RoomView; game: PlayerView }) 
           </li>
         ))}
       </ul>
+      <TeamCount players={game.players.length} />
     </section>
+  );
+}
+
+/** How many of each side sit at the table: the one number everyone deduces from. */
+function TeamCount({ players }: { players: number }) {
+  const { liberals, fascists } = countRules(players);
+  const item = (role: Role, text: string) => (
+    <span className="inline-flex items-center gap-1">
+      <img src={art.roleIcon[role]} alt="" className="h-[1.15em]" />
+      {text}
+    </span>
+  );
+  return (
+    <p className="m-0 mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1 font-sans text-[12px] font-bold text-text-2">
+      <span className="sr-only">En la mesa:</span>
+      {item('liberal', `${liberals} liberales`)}
+      {item('fascist', `${fascists} ${fascists === 1 ? 'fascista' : 'fascistas'}`)}
+      {item('hitler', 'Hitler')}
+    </p>
   );
 }
 
