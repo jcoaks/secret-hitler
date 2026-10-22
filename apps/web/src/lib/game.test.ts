@@ -1,6 +1,6 @@
 import { applyAction, createGame, type GameState, seededRandom, viewFor } from '@sh/engine';
 import { describe, expect, it } from 'vitest';
-import { announcementsFor } from './announcements';
+import { announcementsFor, nominationAnnouncement, nominationKey } from './announcements';
 import { knownRole, mustAct, statusText, waitingOn } from './game';
 
 const random = seededRandom(3);
@@ -76,5 +76,21 @@ describe('anuncios', () => {
     expect(announcementsFor(state.chronicle, viewFor(state, 'p3'), nameOf)[0]?.title).toBe(
       'HAS SIDO EJECUTADO',
     );
+  });
+});
+
+describe('el aviso de nominación', () => {
+  it('cuenta quién nomina a quién y solo los fascistas ven a su equipo', () => {
+    const state = act(game(), { type: 'nominate', playerId: 'p0', targetId: 'p1' });
+    const liberal = nominationAnnouncement(viewFor(state, 'p2'), nameOf);
+    expect(liberal?.text).toContain('Ana, como presidente, nomina a Beto como canciller');
+    expect(liberal?.government).toEqual({ presidentId: 'p0', chancellorId: 'p1' });
+    expect(liberal?.hint).toBeUndefined();
+    expect(nominationAnnouncement(viewFor(state, 'p0'), nameOf)?.hint).toBe(
+      'Beto es fascista, de tu equipo.',
+    );
+    expect(nominationAnnouncement(viewFor(state, 'p1'), nameOf)?.hint).toBe('Ana es Hitler.');
+    expect(nominationKey(viewFor(state, 'p2'))).not.toBeNull();
+    expect(nominationKey(viewFor(game(), 'p2'))).toBeNull();
   });
 });

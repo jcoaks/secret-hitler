@@ -61,7 +61,7 @@ import { PlayerCard } from './PlayerCard';
 /** Every seat in turn order, on the dark band of the original layout. */
 export function PlayerRow({ room, game }: { room: RoomView; game: PlayerView }) {
   const revealedVotes = useUiStore((s) => s.announcements[0]?.votes ?? null);
-  const announcing = useAnnouncing(game.chronicle.length);
+  const announcing = useAnnouncing(game);
   const speech = useSpeech(room.chat, announcing);
   const busy = new Set(revealedVotes ? [] : waitingOn(game));
   const seat = (id: PlayerId) => room.players.find((p) => p.id === id);

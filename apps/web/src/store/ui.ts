@@ -1,5 +1,6 @@
+import type { PlayerView } from '@sh/engine';
 import { create } from 'zustand';
-import type { Announcement } from '../lib/announcements';
+import { type Announcement, nominationKey } from '../lib/announcements';
 
 export type Dialog = 'leave' | 'history' | 'role' | 'rules' | null;
 
@@ -17,6 +18,12 @@ interface UiStore {
   seenChronicle: number | null;
   /** Called with every game view: queues what happened since the last one. */
   syncChronicle(length: number, fresh: () => Announcement[]): void;
+  /** The open election already announced (nominations are not in the chronicle). */
+  seenNomination: string | null;
+  /** Queues the nomination of a new election; `first` is the first game view (no news). */
+  syncNomination(key: string | null, first: boolean, fresh: () => Announcement | null): void;
+  /** Puts an announcement ahead of the queue. */
+  announceFirst(announcement: Announcement): void;
   nextAnnouncement(): void;
   resetAnnouncements(): void;
 }
@@ -36,14 +43,28 @@ export const useUiStore = create<UiStore>((set, get) => ({
     if (length === seen) return;
     set({ seenChronicle: length, announcements: [...get().announcements, ...fresh()] });
   },
+  seenNomination: null,
+  syncNomination(key, first, fresh) {
+    if (key === null || key === get().seenNomination) return;
+    const announcement = first ? null : fresh();
+    set({
+      seenNomination: key,
+      announcements: announcement ? [...get().announcements, announcement] : get().announcements,
+    });
+  },
+  announceFirst: (announcement) => set({ announcements: [announcement, ...get().announcements] }),
   nextAnnouncement: () => set({ announcements: get().announcements.slice(1) }),
-  resetAnnouncements: () => set({ announcements: [], seenChronicle: null }),
+  resetAnnouncements: () => set({ announcements: [], seenChronicle: null, seenNomination: null }),
 }));
 
 /** True while an announcement is on screen or about to be. */
-export function useAnnouncing(chronicleLength: number): boolean {
+export function useAnnouncing(game: PlayerView | null): boolean {
+  const length = game?.chronicle.length ?? 0;
+  const nomination = game ? nominationKey(game) : null;
   return useUiStore(
     (s) =>
-      s.announcements.length > 0 || (s.seenChronicle !== null && s.seenChronicle < chronicleLength),
+      s.announcements.length > 0 ||
+      (s.seenChronicle !== null &&
+        (s.seenChronicle < length || (nomination !== null && s.seenNomination !== nomination))),
   );
 }

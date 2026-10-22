@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button';
 import { Dialog } from '../components/ui/Dialog';
 import { Header, HeaderButton } from '../components/ui/Header';
 import { useRoom } from '../hooks';
+import { openingAnnouncement } from '../lib/announcements';
 import { statusText } from '../lib/game';
 import { introSeen } from '../lib/session';
 import { useAnnouncing, useUiStore } from '../store/ui';
@@ -22,7 +23,7 @@ export function GameScreen() {
   const dialog = useUiStore((s) => s.dialog);
   const openDialog = useUiStore((s) => s.openDialog);
   const closeDialog = useUiStore((s) => s.closeDialog);
-  const announcing = useAnnouncing(game?.chronicle.length ?? 0);
+  const announcing = useAnnouncing(game);
   // The envelope opens once per game, unless the player rejoins after it started.
   const [introDone, setIntroDone] = useState(
     () => introSeen.get(room.code) || (game ? game.chronicle.length > 0 : true),
@@ -69,7 +70,7 @@ export function GameScreen() {
       )}
       <BoardArea game={game} />
 
-      <Announcements room={room} game={game} />
+      <Announcements room={room} game={game} paused={!introDone && !over} />
       {introDone || over ? (
         <ActionPrompt />
       ) : (
@@ -78,6 +79,7 @@ export function GameScreen() {
           onDone={() => {
             introSeen.set(room.code, true);
             setIntroDone(true);
+            useUiStore.getState().announceFirst(openingAnnouncement(game, nameOf));
           }}
         />
       )}

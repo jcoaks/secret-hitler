@@ -7,14 +7,14 @@ import { Dialog } from '../../components/ui/Dialog';
 import { useActions, useCanAct, useRoom } from '../../hooks';
 import { art } from '../../lib/assets';
 import { knownRole, mustAct } from '../../lib/game';
-import { POLICY_NAME } from '../../lib/text';
+import { POLICY_NAME, ROLE_NAME } from '../../lib/text';
 import { useAnnouncing } from '../../store/ui';
 
 /** The decision the viewer has to make right now, as the original's alert prompts. */
 export function ActionPrompt() {
   const room = useRoom();
   const game = room.game;
-  const announcing = useAnnouncing(game?.chronicle.length ?? 0);
+  const announcing = useAnnouncing(game);
   if (!game || announcing || !mustAct(game)) return null;
   // Remount per decision so selections never carry over.
   const key = `${game.round}-${game.phase}-${game.you.hand?.length ?? 0}`;
@@ -229,8 +229,10 @@ function VotePrompt({ game }: { game: PlayerView }) {
   return (
     <PromptDialog title="VOTA EL GOBIERNO" width={640}>
       <p className="m-0 text-[17px] text-text-2">
-        <strong className="text-orange-hover">{nameOf(game.presidentId)}</strong> como presidente y{' '}
-        <strong className="text-liberal-hover">{nameOf(game.chancellorId)}</strong> como canciller.
+        <strong className="text-orange-hover">{nameOf(game.presidentId)}</strong>
+        <KnownRoleIcon game={game} id={game.presidentId} /> como presidente y{' '}
+        <strong className="text-liberal-hover">{nameOf(game.chancellorId)}</strong>
+        <KnownRoleIcon game={game} id={game.chancellorId} /> como canciller.
       </p>
       {game.enacted.fascist >= game.board.hitlerChancellorWinsFrom && (
         <p className="m-0 text-[14px] font-bold text-orange-hover">
@@ -256,6 +258,20 @@ function VotePrompt({ game }: { game: PlayerView }) {
         Los votos se revelan cuando todos hayan votado. Un empate rechaza al gobierno.
       </p>
     </PromptDialog>
+  );
+}
+
+/** A teammate's (or investigated) role next to their name, for whoever knows it. */
+function KnownRoleIcon({ game, id }: { game: PlayerView; id: PlayerId | null }) {
+  const role = id && id !== game.you.id ? knownRole(game, id) : null;
+  if (!role) return null;
+  return (
+    <span
+      className={`mx-1 inline-flex items-center gap-1 rounded bg-white/10 px-1.5 align-[0.1em] text-[13px] font-bold ${role === 'liberal' ? 'text-liberal-hover' : 'text-orange-hover'}`}
+    >
+      <img src={art.roleIcon[role]} alt="" className="h-[1.1em]" />
+      {ROLE_NAME[role]}
+    </span>
   );
 }
 

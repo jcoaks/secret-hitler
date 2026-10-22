@@ -1,4 +1,5 @@
 import type { ChronicleEntry, Party, PlayerId, PlayerView, Policy } from '@sh/engine';
+import { knownRole } from './game';
 import { POLICY_NAME, POWER_NAME } from './text';
 
 export interface Announcement {
@@ -9,6 +10,10 @@ export interface Announcement {
   policy?: Policy;
   /** Investigation result card, only for the investigator. */
   party?: Party;
+  /** President and nominee shown as cards, with the roles the viewer knows. */
+  government?: { presidentId: PlayerId; chancellorId: PlayerId };
+  /** A line just for the viewer, e.g. that the nominee is a teammate. */
+  hint?: string;
   /** Milliseconds on screen; without it the player has to dismiss it. */
   duration?: number;
 }
@@ -123,4 +128,65 @@ export function announcementsFor(
     }
   }
   return out;
+}
+
+/** Identifies an open election, so its nomination is announced once. */
+export function nominationKey(game: PlayerView): string | null {
+  return game.phase === 'election' && game.chancellorId
+    ? `${game.round}:${game.presidentId}:${game.chancellorId}`
+    : null;
+}
+
+/** Who is up for a vote, before the ballot opens. Fascists are reminded who is on their team. */
+export function nominationAnnouncement(
+  game: PlayerView,
+  nameOf: (id: PlayerId) => string,
+): Announcement | null {
+  const chancellorId = game.chancellorId;
+  if (game.phase !== 'election' || !chancellorId) return null;
+  const you = game.you.id;
+  const president = nameOf(game.presidentId);
+  const chancellor = nameOf(chancellorId);
+  const hints: string[] = [];
+  if (game.you.party === 'fascist') {
+    for (const id of [game.presidentId, chancellorId]) {
+      const role = id === you ? null : knownRole(game, id);
+      if (role === 'hitler') hints.push(`${nameOf(id)} es Hitler.`);
+      else if (role === 'fascist') hints.push(`${nameOf(id)} es fascista, de tu equipo.`);
+    }
+  }
+  if (game.enacted.fascist >= game.board.hitlerChancellorWinsFrom) {
+    hints.push(
+      knownRole(game, chancellorId) === 'hitler'
+        ? '¡Si sale elegido, ganan los fascistas!'
+        : 'Ojo: si el canciller es Hitler y sale elegido, ganan los fascistas.',
+    );
+  }
+  return {
+    title: 'NOMINACIÓN',
+    text:
+      game.presidentId === you
+        ? `Nominaste a ${chancellor} como canciller. Ahora vota toda la mesa.`
+        : chancellorId === you
+          ? `${president}, como presidente, te nomina como canciller. Ahora vota toda la mesa.`
+          : `${president}, como presidente, nomina a ${chancellor} como canciller. Ahora vota toda la mesa.`,
+    government: { presidentId: game.presidentId, chancellorId },
+    hint: hints.length > 0 ? hints.join(' ') : undefined,
+    duration: 4500,
+  };
+}
+
+/** Shown once the envelope is closed: what happens next. */
+export function openingAnnouncement(
+  game: PlayerView,
+  nameOf: (id: PlayerId) => string,
+): Announcement {
+  return {
+    title: 'COMIENZA LA PARTIDA',
+    text:
+      game.presidentId === game.you.id
+        ? 'Eres el primer presidente: nomina a un canciller y la mesa votará si forman gobierno.'
+        : `${nameOf(game.presidentId)} es el primer presidente: nominará a un canciller y la mesa votará si forman gobierno.`,
+    duration: 4000,
+  };
 }
