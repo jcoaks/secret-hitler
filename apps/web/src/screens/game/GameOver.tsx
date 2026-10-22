@@ -13,21 +13,25 @@ const BANNER_EDGE: Record<Party, string> = { liberal: '#62adbf', fascist: '#e464
 
 const FAREWELL_MS = 3800;
 
-/** The bots' last words, one bubble at a time, round and round while the screen is open. */
-function useFarewell(chat: ChatLine[]): ChatLine | null {
+/**
+ * The bots' last words, one bubble each, in order, once. They play again every time the end
+ * screen is reopened (`showing` turns back on).
+ */
+function useFarewell(chat: ChatLine[], showing: boolean): ChatLine | null {
   const farewells = chat.filter((line) => line.final);
   const [index, setIndex] = useState(-1);
   const count = farewells.length;
   useEffect(() => {
-    if (count === 0) return;
-    const first = window.setTimeout(() => setIndex(0), 900);
-    const timer = window.setInterval(() => setIndex((i) => (i + 1) % count), FAREWELL_MS);
+    setIndex(-1);
+    if (!showing || count === 0) return;
+    const timers = Array.from({ length: count + 1 }, (_, i) =>
+      window.setTimeout(() => setIndex(i < count ? i : -1), 900 + i * FAREWELL_MS),
+    );
     return () => {
-      window.clearTimeout(first);
-      window.clearInterval(timer);
+      for (const timer of timers) window.clearTimeout(timer);
     };
-  }, [count]);
-  return index >= 0 ? (farewells[index % count] ?? null) : null;
+  }, [count, showing]);
+  return index >= 0 ? (farewells[index] ?? null) : null;
 }
 
 const TEAM_TITLE: Record<Party, string> = { liberal: 'LIBERALES', fascist: 'FASCISTAS' };
@@ -91,7 +95,7 @@ export function GameOver({ room, game }: { room: RoomView; game: PlayerView }) {
   const winner = game.winner ?? 'liberal';
   const won = game.you.party === winner;
   const loser: Party = winner === 'liberal' ? 'fascist' : 'liberal';
-  const speaking = useFarewell(room.chat);
+  const speaking = useFarewell(room.chat, !minimized);
 
   if (minimized) {
     return (
