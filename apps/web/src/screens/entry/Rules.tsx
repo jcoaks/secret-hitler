@@ -1,3 +1,4 @@
+import { type Role, rules } from '@sh/engine';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { art } from '../../lib/assets';
@@ -14,6 +15,68 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
+/** Players at the table against how many of each role, straight from the rules file. */
+function TeamTable() {
+  const counts = Object.entries(rules.playerCounts);
+  const cell = 'border-t border-white/10 px-2 py-1.5 text-center';
+  const head = (role: Role, text: string) => (
+    <th scope="row" className={`${cell} text-left font-bold text-white`}>
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+        <img src={art.roleIcon[role]} alt="" className="h-[1.1em]" />
+        {text}
+      </span>
+    </th>
+  );
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-[15px] tabular-nums">
+        <thead>
+          <tr>
+            <th scope="col" className="px-2 py-1.5 text-left font-bold text-white">
+              Jugadores
+            </th>
+            {counts.map(([players]) => (
+              <th
+                key={players}
+                scope="col"
+                className="px-2 py-1.5 text-center font-bold text-white"
+              >
+                {players}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {head('liberal', 'Liberales')}
+            {counts.map(([players, count]) => (
+              <td key={players} className={`${cell} text-liberal-hover`}>
+                {count.liberals}
+              </td>
+            ))}
+          </tr>
+          <tr>
+            {head('fascist', 'Fascistas')}
+            {counts.map(([players, count]) => (
+              <td key={players} className={`${cell} text-orange-hover`}>
+                {count.fascists}
+              </td>
+            ))}
+          </tr>
+          <tr>
+            {head('hitler', 'Hitler')}
+            {counts.map(([players]) => (
+              <td key={players} className={`${cell} text-orange-hover`}>
+                1
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 /** The rules, summarized from the official rulebook: the /reglas page and the in-game dialog. */
 export function RulesContent() {
   return (
@@ -25,11 +88,7 @@ export function RulesContent() {
           fascistas se conocen entre sí y saben quién es Hitler. Con 5 o 6 jugadores, Hitler también
           conoce al fascista; con 7 o más, Hitler no sabe quiénes son.
         </p>
-        <ul className="m-0 pl-5">
-          <li>5 jugadores: 3 liberales, 1 fascista y Hitler.</li>
-          <li>6: 4 liberales · 7: 4 liberales y 2 fascistas · 8: 5 y 2.</li>
-          <li>9: 5 liberales y 3 fascistas · 10: 6 y 3. Siempre hay un Hitler.</li>
-        </ul>
+        <TeamTable />
       </Section>
 
       <Section title="Cómo se gana">
